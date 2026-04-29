@@ -82,54 +82,27 @@
   details summary { cursor:pointer; font-size:12px; color:var(--text-secondary); }
   pre { background:var(--bg-soft); padding:8px; border-radius:var(--radius-md); font-size:11px; overflow-x:auto; margin:6px 0 0; font-family:var(--font-mono); line-height:1.5; max-height:260px; overflow-y:auto; white-space:pre-wrap; word-break:break-all; }
 
-  /* ===== Tokenizer Status ===== */
-  .tokenizer-status { display:flex; align-items:center; gap:8px; font-size:12px; padding:6px 10px; border-radius:var(--radius-md); margin-bottom:12px; }
-  .tokenizer-status.loading { background:var(--bg-info-soft); color:var(--text-info); }
-  .tokenizer-status.ready { background:var(--bg-success-soft); color:var(--text-success); }
-  .tokenizer-status.error { background:var(--bg-error-soft); color:var(--text-error); }
-
-  /* ===== Kanji Editor ===== */
-  .kanji-list { display:flex; flex-direction:column; gap:6px; max-height:340px; overflow-y:auto; padding-right:2px; }
-  .kanji-row { display:grid; grid-template-columns:110px 1fr 80px 28px; gap:8px; align-items:center; padding:7px 10px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:var(--radius-md); }
-  .kanji-row.from-dict { background:linear-gradient(to right,var(--bg-purple-soft) 0%,var(--bg-card) 30%); }
-  .kanji-row.user-edited { border-color:var(--accent); }
-  .kanji-surface { font-size:16px; font-weight:500; }
-  .kanji-row .input { padding:4px 7px; font-size:13px; }
-  .kanji-source { font-size:11px; color:var(--text-tertiary); text-align:center; }
-  .kanji-source.dict { color:var(--text-purple); font-weight:500; }
-  .kanji-source.kuromoji { color:var(--text-secondary); }
-  .kanji-source.unknown { color:var(--text-warning); }
-  .kanji-source.edited { color:var(--accent); font-weight:500; }
-  .kanji-list-empty { padding:18px; text-align:center; font-size:13px; color:var(--text-tertiary); background:var(--bg-soft); border-radius:var(--radius-md); }
-  .icon-btn-x { width:22px; height:22px; border-radius:4px; border:none; background:transparent; color:var(--text-tertiary); cursor:pointer; font-size:15px; line-height:1; }
-  .icon-btn-x:hover { background:var(--bg-soft); color:var(--text-error); }
-  .summary-bar { display:flex; gap:12px; flex-wrap:wrap; padding:8px 12px; background:var(--bg-soft); border-radius:var(--radius-md); font-size:12px; margin-bottom:10px; }
-  .summary-item { color:var(--text-secondary); }
-  .summary-item strong { color:var(--text-primary); font-weight:500; }
-  .tts-preview { background:var(--bg-soft); padding:10px 12px; border-radius:var(--radius-md); font-size:13px; line-height:1.7; margin-top:10px; }
-  .tts-preview .label { font-size:11px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:4px; }
-
   /* ===== User Dict ===== */
   .user-dict-empty { font-size:12px; color:var(--text-tertiary); padding:10px; text-align:center; background:var(--bg-soft); border-radius:var(--radius-md); }
-  .dict-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:5px; max-height:180px; overflow-y:auto; }
+  .dict-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:5px; max-height:260px; overflow-y:auto; }
   .dict-pill { display:flex; align-items:center; justify-content:space-between; padding:4px 8px; background:var(--bg-purple-soft); border-radius:var(--radius-md); font-size:12px; color:var(--text-purple); }
   .dict-pill .reading { color:var(--text-secondary); margin-left:5px; }
+  .icon-btn-x { width:22px; height:22px; border-radius:4px; border:none; background:transparent; color:var(--text-tertiary); cursor:pointer; font-size:15px; line-height:1; }
+  .icon-btn-x:hover { background:var(--bg-soft); color:var(--text-error); }
 
   /* ===== Script View ===== */
-  .script-layout { display:grid; grid-template-columns:1fr 210px; gap:12px; }
+  .script-layout { display:grid; grid-template-columns:1fr 220px; gap:12px; }
   @media (max-width:580px) { .script-layout { grid-template-columns:1fr; } }
-  .script-preview-list { display:flex; flex-direction:column; gap:3px; max-height:300px; overflow-y:auto; }
-  .preview-item { display:flex; align-items:center; gap:5px; padding:3px 6px; border-radius:var(--radius-sm); font-size:11px; }
-  .preview-num { font-family:var(--font-mono); color:var(--text-tertiary); min-width:22px; text-align:right; flex-shrink:0; }
-  .preview-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-  .preview-speaker { font-weight:500; flex-shrink:0; max-width:55px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .script-preview-list { display:flex; flex-direction:column; gap:3px; max-height:320px; overflow-y:auto; }
+  .preview-item { display:flex; align-items:baseline; gap:6px; padding:3px 6px; border-radius:var(--radius-sm); font-size:11px; }
+  .preview-num { font-family:var(--font-mono); color:var(--text-tertiary); min-width:30px; text-align:right; flex-shrink:0; font-size:10px; }
   .preview-text { color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .preview-empty { font-size:12px; color:var(--text-tertiary); padding:12px; text-align:center; }
+  .script-stats-bar { display:flex; gap:10px; flex-wrap:wrap; font-size:12px; color:var(--text-secondary); padding:6px 0; }
+  .script-stats-bar strong { color:var(--text-primary); }
 
-  /* ===== Speaker Cards ===== */
-  .speaker-card { background:var(--bg-card); border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:14px; margin-bottom:10px; }
-  .speaker-card-head { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
-  .speaker-color-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  /* ===== Narrator Card ===== */
+  .narrator-card { background:var(--bg-card); border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:14px; margin-bottom:10px; }
   .tone-presets { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
   .tone-preset-chip { padding:2px 8px; font-size:11px; border:0.5px solid var(--border-strong); border-radius:999px; background:transparent; cursor:pointer; font-family:inherit; color:var(--text-secondary); }
   .tone-preset-chip:hover { background:var(--bg-soft); color:var(--text-primary); }
@@ -144,6 +117,10 @@
   .filter-tab { padding:3px 10px; border-radius:999px; font-size:12px; border:0.5px solid var(--border-strong); background:transparent; cursor:pointer; font-family:inherit; color:var(--text-secondary); }
   .filter-tab.active { background:var(--accent); color:white; border-color:var(--accent); }
 
+  /* ===== Chapter Header ===== */
+  .chapter-header { grid-column:1/-1; font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.5px; padding:10px 2px 4px; border-top:0.5px solid var(--border); margin-top:2px; }
+  .chapter-header:first-child { border-top:none; padding-top:0; margin-top:0; }
+
   /* ===== Clip Cards ===== */
   .clip-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; }
   .clip-card { background:var(--bg-card); border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:12px; display:flex; flex-direction:column; gap:7px; transition:border-color 0.1s; }
@@ -151,12 +128,11 @@
   .cc-head { display:flex; align-items:center; gap:5px; }
   .cc-check { cursor:pointer; }
   .cc-id { font-size:11px; font-weight:700; color:var(--text-tertiary); font-family:var(--font-mono); flex-shrink:0; }
-  .cc-status { font-size:10px; padding:1px 6px; border-radius:999px; font-weight:500; flex-shrink:0; }
+  .cc-status { font-size:10px; padding:1px 6px; border-radius:999px; font-weight:500; flex-shrink:0; margin-left:auto; }
   .cc-status.todo { background:var(--bg-soft); color:var(--text-secondary); }
   .cc-status.loading { background:var(--bg-info-soft); color:var(--text-info); }
   .cc-status.done { background:var(--bg-success-soft); color:var(--text-success); }
   .cc-status.redo { background:var(--bg-warning-soft); color:var(--text-warning); }
-  .cc-speaker-pill { margin-left:auto; font-size:11px; padding:1px 8px; border-radius:999px; border:0.5px solid; cursor:pointer; font-family:inherit; font-weight:500; white-space:nowrap; flex-shrink:0; }
   .cc-text { font-size:12px; color:var(--text-secondary); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; min-height:46px; line-height:1.5; }
   .cc-tone-row { display:flex; align-items:center; gap:5px; }
   .cc-label { color:var(--text-tertiary); font-size:10px; white-space:nowrap; flex-shrink:0; }
@@ -185,22 +161,22 @@
   <header class="app-header">
     <div class="app-brand">
       <div class="app-title">TTS 클립 작업대</div>
-      <span class="app-tagline">일본어 드라마 클립 제작</span>
+      <span class="app-tagline">나레이션 드라마 클립 제작</span>
     </div>
     <button class="project-btn" onclick="Modal.openProjectList()">
       <span class="project-btn-name" id="projectNameDisplay">프로젝트</span>
       <span style="color:var(--text-tertiary)">▾</span>
     </button>
     <nav class="step-nav" aria-label="단계">
-      <a href="#setup"     class="step-nav-item" data-step="setup">    <span class="step-num">1</span><span>설정</span></a>
+      <a href="#setup"      class="step-nav-item" data-step="setup">      <span class="step-num">1</span><span>설정</span></a>
       <div class="step-connector"></div>
-      <a href="#script"    class="step-nav-item" data-step="script">   <span class="step-num">2</span><span>대본</span></a>
+      <a href="#script"     class="step-nav-item" data-step="script">     <span class="step-num">2</span><span>대본</span></a>
       <div class="step-connector"></div>
-      <a href="#speakers"  class="step-nav-item" data-step="speakers"> <span class="step-num">3</span><span>화자</span></a>
+      <a href="#narrator"   class="step-nav-item" data-step="narrator">   <span class="step-num">3</span><span>나레이터</span></a>
       <div class="step-connector"></div>
-      <a href="#kanji"     class="step-nav-item" data-step="kanji">    <span class="step-num">4</span><span>한자</span></a>
+      <a href="#dictionary" class="step-nav-item" data-step="dictionary"> <span class="step-num">4</span><span>사전</span></a>
       <div class="step-connector"></div>
-      <a href="#workbench" class="step-nav-item" data-step="workbench"><span class="step-num">5</span><span>작업대</span></a>
+      <a href="#workbench"  class="step-nav-item" data-step="workbench">  <span class="step-num">5</span><span>작업대</span></a>
     </nav>
   </header>
 
@@ -223,8 +199,9 @@
         <div class="field">
           <label class="field-label" for="globalModel">TTS 모델</label>
           <select class="select" id="globalModel" onchange="Settings.saveAll()">
-            <option value="gemini-2.5-flash-preview-tts" selected>Gemini 2.5 Flash TTS (Preview)</option>
-            <option value="gemini-2.5-pro-preview-tts">Gemini 2.5 Pro TTS (Preview)</option>
+            <option value="gemini-3.1-flash-tts-preview">Gemini 3.1 Flash TTS (Preview) — 최신, 권장</option>
+            <option value="gemini-2.5-pro-preview-tts">Gemini 2.5 Pro TTS (Preview) — 고품질, 나레이션 최적화</option>
+            <option value="gemini-2.5-flash-preview-tts">Gemini 2.5 Flash TTS (Preview) — 빠르고 저렴</option>
           </select>
         </div>
         <div class="btn-row">
@@ -240,95 +217,85 @@
     <section id="view-script" class="view">
       <div class="card">
         <h2><span class="num">2</span>대본 입력</h2>
-        <p class="card-sub">한 줄이 하나의 클립이 됩니다. 빈 줄은 무시됩니다.</p>
+        <p class="card-sub"><code>1-1</code>, <code>1-2</code> 같은 마커로 단락을 구분합니다. 단락 한 개 = 클립 한 개.</p>
         <div class="field">
           <label class="field-label" for="projectName">프로젝트 이름</label>
-          <input class="input" id="projectName" placeholder="에피소드 12" oninput="ScriptView.onNameChange(this.value)" />
+          <input class="input" id="projectName" placeholder="상점가" oninput="ScriptView.onNameChange(this.value)" />
         </div>
         <div class="script-layout">
           <div>
             <label class="field-label">대본 텍스트</label>
-            <textarea class="textarea" id="scriptText" rows="12"
-              placeholder="約束の場所で待ってる。&#10;雨が降っても、僕は行くよ。&#10;..."
+            <textarea class="textarea" id="scriptText" rows="14"
+              placeholder="1-1&#10;&#10;나레이션 한 문장.&#10;나레이션 또 한 문장.&#10;「인물 대사」&#10;나레이션 마무리.&#10;&#10;1-2&#10;&#10;다음 단락의 나레이션..."
               oninput="ScriptView.onTextChange()"></textarea>
-            <div class="small" style="margin-top:4px" id="scriptStats">0줄</div>
           </div>
           <div>
-            <div class="field-label">클립 미리보기</div>
+            <div class="field-label">단락 미리보기</div>
+            <div id="scriptStatsBar" class="script-stats-bar"></div>
             <div class="script-preview-list" id="scriptPreview">
-              <div class="preview-empty">줄을 입력하면 미리보기가 표시됩니다.</div>
+              <div class="preview-empty">마커(1-1, 1-2...)를 포함한 대본을 입력하면 미리보기가 표시됩니다.</div>
             </div>
           </div>
         </div>
       </div>
       <div class="nav-row">
         <a href="#setup" class="btn">← 설정</a>
-        <button class="btn btn-primary" onclick="ScriptView.onNext()">화자 설정 →</button>
+        <button class="btn btn-primary" onclick="ScriptView.onNext()">나레이터 설정 →</button>
       </div>
     </section>
 
-    <!-- =================== VIEW: Speakers =================== -->
-    <section id="view-speakers" class="view">
+    <!-- =================== VIEW: Narrator =================== -->
+    <section id="view-narrator" class="view">
       <div class="card">
-        <h2><span class="num">3</span>화자 설정</h2>
-        <p class="card-sub">각 화자의 목소리와 기본 톤을 설정합니다. 최대 5명.</p>
-      </div>
-      <div id="speakersList"></div>
-      <div class="btn-row" style="margin-bottom:12px">
-        <button class="btn" id="addSpeakerBtn" onclick="SpeakersView.addSpeaker()">+ 화자 추가</button>
+        <h2><span class="num">3</span>나레이터 설정</h2>
+        <p class="card-sub">나레이터 한 명의 목소리와 기본 톤 지시를 설정합니다. 「」 처리 방식도 톤 지시에 포함하세요.</p>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:flex-end;margin-bottom:10px">
+          <div class="field" style="margin-bottom:0">
+            <label class="field-label" for="narratorVoice">목소리</label>
+            <select class="select" id="narratorVoice" onchange="NarratorView.save()"></select>
+          </div>
+          <button class="btn" onclick="NarratorView.test()" id="narratorTestBtn">▶ 시연</button>
+        </div>
+        <div class="field">
+          <label class="field-label">기본 톤 지시 <span class="small">(자연어, 전 클립에 적용)</span></label>
+          <textarea class="textarea" id="narratorTone" rows="3"
+            oninput="NarratorView.save()"
+            placeholder="차분하고 자연스러운 나레이터 톤으로 읽어주세요. 「」 안의 대사는 등장인물의 대사이므로 약간 다른 톤으로 읽어주세요."></textarea>
+          <div class="tone-presets" id="narratorTonePresets"></div>
+        </div>
+        <div class="small" style="margin-top:6px;color:var(--text-tertiary)">클립별 톤 오버라이드는 작업대에서 개별 설정 가능합니다.</div>
       </div>
       <div class="nav-row">
         <a href="#script" class="btn">← 대본</a>
-        <button class="btn btn-primary" onclick="SpeakersView.onNext()">한자 읽기 →</button>
+        <a href="#dictionary" class="btn btn-primary">사전 →</a>
       </div>
     </section>
 
-    <!-- =================== VIEW: Kanji =================== -->
-    <section id="view-kanji" class="view">
+    <!-- =================== VIEW: Dictionary =================== -->
+    <section id="view-dictionary" class="view">
       <div class="card">
-        <h2><span class="num">4</span>한자 읽기</h2>
-        <p class="card-sub">전체 대본의 한자를 일괄 분석합니다. 잘못된 발음만 수정하세요.</p>
+        <h2><span class="num">4</span>사용자 사전</h2>
+        <p class="card-sub">TTS 호출 전에 단순 치환됩니다. 한자 읽기, 약어 풀기 등에 사용하세요.</p>
 
-        <div id="tokenizerStatus" class="tokenizer-status loading">
-          <span class="spinner"></span>kuromoji.js 사전 로드 중… (첫 로드 시 약 4 MB, 이후 캐시됨)
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:12px">
+          <input class="input" id="dictSurface" placeholder="단어 (예: 約束)" />
+          <input class="input" id="dictReading" placeholder="읽기 (예: やくそく)"
+            onkeydown="if(event.key==='Enter')DictionaryView.addEntry()" />
+          <button class="btn btn-primary" onclick="DictionaryView.addEntry()">추가</button>
         </div>
 
-        <div class="btn-row" style="margin-bottom:10px">
-          <button class="btn btn-primary" id="analyzeBtn" onclick="KanjiView.analyze()">한자 분석</button>
-          <span class="small" id="kanjiAnalyzeInfo"></span>
-        </div>
-
-        <div id="kanjiSection" style="display:none">
-          <div class="summary-bar">
-            <div class="summary-item">한자 단어 <strong id="totalKanjiCount">0</strong>개</div>
-            <div class="summary-item">사전 자동 <strong id="dictCount">0</strong>개</div>
-            <div class="summary-item">kuromoji 추정 <strong id="kuromojiCount">0</strong>개</div>
-            <div class="summary-item">미인식 <strong id="unknownCount">0</strong>개</div>
-          </div>
-          <div class="kanji-list" id="kanjiList"></div>
-          <hr />
-          <div class="tts-preview">
-            <div class="label">TTS 전달 텍스트 (첫 번째 클립)</div>
-            <div id="ttsPreview" style="font-family:var(--font-mono)"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- User Dict -->
-      <div class="card">
-        <h2>사용자 사전 <span class="small" style="font-weight:400">(전역, localStorage)</span></h2>
         <div id="userDictEmpty" class="user-dict-empty">아직 저장된 항목이 없습니다.</div>
         <div class="dict-grid" id="userDictList" style="display:none"></div>
+
         <div class="btn-row" style="margin-top:8px">
           <button class="btn btn-sm" onclick="UserDict.export()">JSON 내보내기</button>
           <button class="btn btn-sm" onclick="UserDict.import()">JSON 가져오기</button>
           <button class="btn btn-sm btn-ghost btn-danger" onclick="UserDict.clear()" style="margin-left:auto">전체 삭제</button>
         </div>
       </div>
-
       <div class="nav-row">
-        <a href="#speakers" class="btn">← 화자</a>
-        <button class="btn btn-primary" onclick="KanjiView.onNext()">작업대 →</button>
+        <a href="#narrator" class="btn">← 나레이터</a>
+        <a href="#workbench" class="btn btn-primary">작업대 →</a>
       </div>
     </section>
 
@@ -377,20 +344,12 @@
   </div>
 </div>
 
-<!-- kuromoji.js loaded inside Web Worker via importScripts -->
 <script>
 'use strict';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONSTANTS
 // ─────────────────────────────────────────────────────────────────────────────
-const SPEAKER_COLORS = [
-  { bg:'#dbeafe', text:'#1d4ed8', border:'#bfdbfe' },
-  { bg:'#dcfce7', text:'#15803d', border:'#bbf7d0' },
-  { bg:'#fef3c7', text:'#b45309', border:'#fde68a' },
-  { bg:'#f3e8ff', text:'#7e22ce', border:'#e9d5ff' },
-  { bg:'#fce7f3', text:'#be185d', border:'#fbcfe8' },
-];
 const VOICES = [
   ['Aoede','Aoede (밝음)'],['Charon','Charon (정보적)'],['Fenrir','Fenrir (흥분된)'],
   ['Kore','Kore (확고함)'],['Leda','Leda (젊음)'],['Orus','Orus (단호함)'],
@@ -398,6 +357,46 @@ const VOICES = [
   ['Callirrhoe','Callirrhoe (편안함)'],
 ];
 const TONE_PRESETS = ['차분하게','밝게','슬프게','강하게','부드럽게','활기차게','긴장감있게','속삭이듯'];
+const DEFAULT_NARRATOR_TONE = '차분하고 자연스러운 나레이터 톤으로 읽어주세요. 「」 안의 대사는 등장인물의 대사이므로 약간 다른 톤으로 읽어주세요.';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// parseScript — 대본 텍스트 → 클립 배열
+// 마커: 줄 시작에 \d+-\d+ 형식 (앞뒤 빈 줄 허용)
+// ─────────────────────────────────────────────────────────────────────────────
+function parseScript(text) {
+  const lines = text.split('\n');
+  const segments = [];
+  let currentId = null;
+  let currentLines = [];
+  const markerRe = /^\s*(\d+)-(\d+)\s*$/;
+
+  function flush() {
+    if (currentId === null) return;
+    const bodyText = currentLines.join('\n').trim();
+    if (bodyText) {
+      const parts = currentId.split('-');
+      segments.push({
+        id: currentId,
+        chapterIndex: parseInt(parts[0], 10),
+        subIndex: parseInt(parts[1], 10),
+        text: bodyText,
+      });
+    }
+  }
+
+  for (const line of lines) {
+    const m = line.match(markerRe);
+    if (m) {
+      flush();
+      currentId = `${m[1]}-${m[2]}`;
+      currentLines = [];
+    } else {
+      if (currentId !== null) currentLines.push(line);
+    }
+  }
+  flush();
+  return segments;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODULE: Utils
@@ -409,14 +408,12 @@ const Utils = (() => {
   }
   function escapeJs(s) { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 
-  // Apply { surface: reading } map to text (longest-first to avoid partial match)
   function applyReadings(text, readingsMap) {
     let result = text;
     const sorted = Object.entries(readingsMap).filter(([,r])=>r)
       .sort(([a],[b])=>b.length-a.length);
     for (const [surface, reading] of sorted) {
-      const esc = surface.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-      result = result.replace(new RegExp(esc,'g'), reading);
+      result = result.replaceAll(surface, reading);
     }
     return result;
   }
@@ -428,9 +425,9 @@ const Utils = (() => {
 // ─────────────────────────────────────────────────────────────────────────────
 const Settings = (() => {
   function load() {
-    _el('proxyUrl').value  = _ls('tts.proxyUrl') || '';
-    _el('apiKey').value    = _ls('tts.apiKey')   || '';
-    _el('globalModel').value = _ls('tts.model') || 'gemini-2.5-flash-preview-tts';
+    _el('proxyUrl').value    = _ls('tts.proxyUrl') || '';
+    _el('apiKey').value      = _ls('tts.apiKey')   || '';
+    _el('globalModel').value = _ls('tts.model')    || 'gemini-3.1-flash-tts-preview';
     if (_ls('tts.proxyUrl') && _ls('tts.apiKey'))
       _el('savedIndicator').style.display = 'inline';
   }
@@ -450,6 +447,7 @@ const Settings = (() => {
     if (!confirm('설정을 초기화할까요?')) return;
     ['tts.proxyUrl','tts.apiKey','tts.model'].forEach(k => localStorage.removeItem(k));
     _el('proxyUrl').value = ''; _el('apiKey').value = '';
+    _el('globalModel').value = 'gemini-3.1-flash-tts-preview';
     _el('savedIndicator').style.display = 'none';
   }
   function get(key) { return localStorage.getItem(key); }
@@ -459,7 +457,7 @@ const Settings = (() => {
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MODULE: UserDict — global kanji dictionary, shared across projects
+// MODULE: UserDict — global word dictionary (localStorage)
 // ─────────────────────────────────────────────────────────────────────────────
 const UserDict = (() => {
   const KEY = 'tts.userDict.v1';
@@ -474,18 +472,22 @@ const UserDict = (() => {
     _persist();
   }
   function remove(surface) { delete _dict[surface]; _persist(); }
-  function get(surface)   { return _dict[surface] || null; }
+  function get(surface)    { return _dict[surface] || null; }
+  function getAll()        { return { ..._dict }; }
   function clear() {
     if (!confirm('사용자 사전 전체를 삭제할까요?')) return;
     _dict = {}; _persist();
   }
+  function refresh() { _render(); }
   function exportDict() { _dl(new Blob([JSON.stringify(_dict,null,2)],{type:'application/json'}), `tts-dict-${_today()}.json`); }
   function importDict() {
     const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
     inp.onchange = async e => {
       const f = e.target.files[0]; if (!f) return;
-      try { const d = JSON.parse(await f.text()); if (typeof d!=='object'||Array.isArray(d)) throw 0;
-        Object.assign(_dict,d); _persist(); alert(`${Object.keys(d).length}개 가져왔습니다.`);
+      try {
+        const d = JSON.parse(await f.text());
+        if (typeof d !== 'object' || Array.isArray(d)) throw 0;
+        Object.assign(_dict, d); _persist(); alert(`${Object.keys(d).length}개 가져왔습니다.`);
       } catch { alert('가져오기 실패'); }
     };
     inp.click();
@@ -493,92 +495,23 @@ const UserDict = (() => {
   function _persist() { localStorage.setItem(KEY, JSON.stringify(_dict)); _render(); }
   function _render() {
     const entries = Object.entries(_dict);
-    const empty = document.getElementById('userDictEmpty');
-    const list  = document.getElementById('userDictList');
+    const empty   = document.getElementById('userDictEmpty');
+    const list    = document.getElementById('userDictList');
     if (!empty || !list) return;
     if (entries.length === 0) { empty.style.display='block'; list.style.display='none'; return; }
-    empty.style.display='none'; list.style.display='grid';
+    empty.style.display = 'none'; list.style.display = 'grid';
     list.innerHTML = entries.sort(([a],[b])=>a.localeCompare(b)).map(([s,r]) =>
       `<div class="dict-pill"><span><strong>${Utils.escapeHtml(s)}</strong><span class="reading"> ${Utils.escapeHtml(r)}</span></span>
        <button class="icon-btn-x" onclick="UserDict.remove('${Utils.escapeJs(s)}')">×</button></div>`
     ).join('');
   }
-  function _dl(blob,name) {
-    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
+  function _dl(blob, name) {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
   function _today() { return new Date().toISOString().slice(0,10); }
-  return { load, set, remove, get, clear, export:exportDict, import:importDict };
-})();
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MODULE: Tokenizer — Web Worker wrapping kuromoji.js
-// ─────────────────────────────────────────────────────────────────────────────
-const Tokenizer = (() => {
-  const WORKER_SRC = `
-    importScripts('https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js');
-    var tokenizer=null, queue=[];
-    kuromoji.builder({dicPath:'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/'})
-      .build(function(err,t){
-        if(err){self.postMessage({type:'error',error:String(err)});}
-        else{tokenizer=t;self.postMessage({type:'ready'});queue.forEach(handle);queue=[];}
-      });
-    function handle(d){
-      try{self.postMessage({type:'tokenize-result',id:d.id,tokens:tokenizer.tokenize(d.text)});}
-      catch(e){self.postMessage({type:'tokenize-error',id:d.id,error:String(e)});}
-    }
-    self.onmessage=function(e){if(tokenizer)handle(e.data);else queue.push(e.data);};
-  `;
-  let _worker=null,_ready=false,_started=false,_promise=null;
-  let _pending=new Map(),_nid=0;
-
-  function init() {
-    if (_started) return _promise;
-    _started = true;
-    _promise = new Promise((resolve,reject)=>{
-      let blobUrl;
-      try {
-        const blob=new Blob([WORKER_SRC],{type:'text/javascript'});
-        blobUrl=URL.createObjectURL(blob);
-        _worker=new Worker(blobUrl);
-        URL.revokeObjectURL(blobUrl);
-      } catch(e){ _started=false; _setStatus('error',`❌ Worker 생성 실패: ${e.message}`); reject(e); return; }
-      _worker.addEventListener('message',e=>{
-        const {type,error,id,tokens}=e.data;
-        if(type==='ready'){
-          _ready=true; _setStatus('ready','✓ kuromoji 준비 완료');
-          setTimeout(()=>{ const el=document.getElementById('tokenizerStatus'); if(el)el.style.display='none'; },2000);
-          resolve();
-        } else if(type==='error'){
-          _started=false; _setStatus('error',`❌ kuromoji 로드 실패: ${error}`); reject(new Error(error));
-        } else if(type==='tokenize-result'){
-          const p=_pending.get(id); if(p){_pending.delete(id);p.resolve(tokens);}
-        } else if(type==='tokenize-error'){
-          const p=_pending.get(id); if(p){_pending.delete(id);p.reject(new Error(error));}
-        }
-      });
-      _worker.addEventListener('error',e=>{ _started=false; _setStatus('error',`❌ ${e.message||'Worker 오류'}`); reject(new Error(e.message)); });
-    });
-    return _promise;
-  }
-
-  function tokenize(text) {
-    return new Promise((resolve,reject)=>{
-      if(!_worker){reject(new Error('Worker 미시작'));return;}
-      const id=_nid++;
-      _pending.set(id,{resolve,reject});
-      _worker.postMessage({type:'tokenize',id,text});
-    });
-  }
-
-  function _setStatus(cls,text) {
-    const el=document.getElementById('tokenizerStatus'); if(!el)return;
-    el.style.display='flex'; el.className=`tokenizer-status ${cls}`;
-    el.innerHTML=cls==='loading'?`<span class="spinner"></span>${text}`:text;
-  }
-  function isReady(){ return _ready; }
-  return { init, tokenize, isReady };
+  return { load, set, remove, get, getAll, clear, refresh, export:exportDict, import:importDict };
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -601,10 +534,10 @@ const AudioUtils = (() => {
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MODULE: Storage — IndexedDB helper (no external libs)
+// MODULE: Storage — IndexedDB (v2 for new data model)
 // ─────────────────────────────────────────────────────────────────────────────
 const Storage = (() => {
-  const DB='tts-workbench', VER=1;
+  const DB='tts-workbench-v2', VER=1;
   let _db=null;
 
   function open() {
@@ -613,7 +546,7 @@ const Storage = (() => {
       const req=indexedDB.open(DB,VER);
       req.onupgradeneeded=e=>{
         const db=e.target.result;
-        if(!db.objectStoreNames.contains('projects')) db.createObjectStore('projects',{keyPath:'id'});
+        if(!db.objectStoreNames.contains('projects'))  db.createObjectStore('projects', {keyPath:'id'});
         if(!db.objectStoreNames.contains('audioBlobs')) db.createObjectStore('audioBlobs',{keyPath:'key'});
       };
       req.onsuccess=e=>{ _db=e.target.result; resolve(_db); };
@@ -641,10 +574,10 @@ const App = (() => {
   let _project=null, _timer=null;
 
   async function init() {
-    const lastId=localStorage.getItem('tts.lastProjectId');
-    if(lastId){ const p=await Storage.get('projects',lastId); if(p){_set(p);return;} }
-    const all=await Storage.getAll('projects');
-    if(all.length>0){
+    const lastId = localStorage.getItem('tts.lastProjectId');
+    if (lastId) { const p=await Storage.get('projects',lastId); if(p){_set(p);return;} }
+    const all = await Storage.getAll('projects');
+    if (all.length > 0) {
       all.sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));
       _set(all[0]);
     } else {
@@ -653,137 +586,36 @@ const App = (() => {
   }
 
   async function createProject(name='새 프로젝트') {
-    const p={
-      id:crypto.randomUUID(), name, createdAt:now(), updatedAt:now(),
-      speakers:[
-        {id:crypto.randomUUID(),name:'화자 1',voice:'Charon',tone:'',color:0},
-        {id:crypto.randomUUID(),name:'화자 2',voice:'Aoede', tone:'',color:1},
-      ],
-      kanjiReadings:{}, clips:[]
+    const p = {
+      id: crypto.randomUUID(), name, createdAt: now(), updatedAt: now(),
+      narrator: { voice: 'Charon', baseTone: DEFAULT_NARRATOR_TONE },
+      kanjiReadings: {},
+      clips: [],
     };
-    await Storage.put('projects',p);
+    await Storage.put('projects', p);
     _set(p);
     return p;
   }
 
-  function _set(p){ _project=p; localStorage.setItem('tts.lastProjectId',p.id); _updateHeader(); }
-  function _updateHeader(){ const el=document.getElementById('projectNameDisplay'); if(el)el.textContent=_project?.name||'프로젝트'; }
-  function currentProject(){ return _project; }
-  function scheduleSave(){ clearTimeout(_timer); _timer=setTimeout(saveNow,5000); }
-  async function saveNow(){
+  function _set(p) {
+    _project = p;
+    localStorage.setItem('tts.lastProjectId', p.id);
+    _updateHeader();
+  }
+  function _updateHeader() {
+    const el = document.getElementById('projectNameDisplay');
+    if (el) el.textContent = _project?.name || '프로젝트';
+  }
+  function currentProject() { return _project; }
+  function scheduleSave() { clearTimeout(_timer); _timer = setTimeout(saveNow, 5000); }
+  async function saveNow() {
     clearTimeout(_timer);
-    if(!_project)return;
-    _project.updatedAt=now();
-    await Storage.put('projects',_project);
+    if (!_project) return;
+    _project.updatedAt = now();
+    await Storage.put('projects', _project);
   }
-  function now(){ return new Date().toISOString(); }
-  return { init, createProject, currentProject, scheduleSave, saveNow, _updateHeader };
-})();
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MODULE: KanjiAnalysis — tokenizer + kanji entry management
-// ─────────────────────────────────────────────────────────────────────────────
-const KanjiAnalysis = (() => {
-  const SRC_LABELS={dict:['★ 사전','dict'],kuromoji:['추정','kuromoji'],unknown:['미인식','unknown'],edited:['편집됨','edited']};
-  const _state={ entries:[], sourceText:'' };
-
-  async function analyze(text) {
-    if(!Tokenizer.isReady()){ alert('kuromoji가 아직 준비되지 않았습니다.'); return; }
-    if(!text?.trim()){ alert('분석할 텍스트가 없습니다.'); return; }
-    _state.sourceText = text.trim();
-
-    const btn=document.getElementById('analyzeBtn');
-    if(btn) btn.disabled=true;
-    try {
-      const tokens=await Tokenizer.tokenize(_state.sourceText);
-      const seen=new Set();
-      // Merge project-level readings as starting point
-      const projReadings=App.currentProject()?.kanjiReadings||{};
-      _state.entries=tokens
-        .filter(t=>_kanji(t.surface_form)&&!seen.has(t.surface_form)&&seen.add(t.surface_form))
-        .map(t=>{
-          const s=t.surface_form;
-          const dictR=UserDict.get(s);
-          if(dictR) return {surface:s,reading:dictR,source:'dict'};
-          if(projReadings[s]) return {surface:s,reading:projReadings[s],source:'dict'};
-          if(t.reading&&t.reading!=='*') return {surface:s,reading:_kata2hira(t.reading),source:'kuromoji'};
-          return {surface:s,reading:'',source:'unknown'};
-        });
-      _render();
-      _updatePreview();
-      document.getElementById('kanjiSection').style.display='block';
-    } finally {
-      if(btn) btn.disabled=false;
-    }
-  }
-
-  function updateReading(idx,value) {
-    const e=_state.entries[idx]; if(!e)return;
-    e.reading=value.trim();
-    if(e.reading){ e.source='edited'; UserDict.set(e.surface,e.reading); _syncProject(e.surface,e.reading); }
-    const row=document.querySelectorAll('.kanji-row')[idx];
-    if(row){ row.classList.remove('from-dict'); row.classList.add('user-edited'); const l=row.querySelector('.kanji-source'); l.className='kanji-source edited'; l.textContent='편집됨'; }
-    _updateSummary(); _updatePreview();
-  }
-
-  function removeEntry(idx){ _state.entries.splice(idx,1); _render(); _updatePreview(); }
-
-  function saveToProject() {
-    const proj=App.currentProject(); if(!proj)return;
-    _state.entries.filter(e=>e.reading).forEach(e=>{ proj.kanjiReadings[e.surface]=e.reading; });
-    App.scheduleSave();
-  }
-
-  function getEntries(){ return _state.entries; }
-
-  function _syncProject(surface,reading) {
-    const proj=App.currentProject(); if(!proj)return;
-    proj.kanjiReadings[surface]=reading; App.scheduleSave();
-  }
-
-  function _render() {
-    const list=document.getElementById('kanjiList'); if(!list)return;
-    list.innerHTML='';
-    if(_state.entries.length===0){ list.innerHTML='<div class="kanji-list-empty">한자가 감지되지 않았습니다.</div>'; _updateSummary(); return; }
-    _state.entries.forEach((e,i)=>{
-      const [label,cls]=SRC_LABELS[e.source]||['',''];
-      const row=document.createElement('div');
-      row.className='kanji-row'+(e.source==='dict'?' from-dict':e.source==='edited'?' user-edited':'');
-      row.innerHTML=`<div class="kanji-surface">${Utils.escapeHtml(e.surface)}</div>
-        <input class="input" type="text" value="${Utils.escapeHtml(e.reading)}" placeholder="가나 입력" oninput="KanjiAnalysis.updateReading(${i},this.value)"/>
-        <div class="kanji-source ${cls}">${label}</div>
-        <button class="icon-btn-x" onclick="KanjiAnalysis.removeEntry(${i})">×</button>`;
-      list.appendChild(row);
-    });
-    _updateSummary();
-  }
-
-  function _updateSummary() {
-    const e=_state.entries;
-    const q=id=>{ const el=document.getElementById(id); if(el)el.textContent=e.filter(x=>x.source===id.replace('Count','')).length; };
-    const t=document.getElementById('totalKanjiCount'); if(t)t.textContent=e.length;
-    q('dictCount'); q('kuromojiCount'); q('unknownCount');
-  }
-
-  function _updatePreview() {
-    const el=document.getElementById('ttsPreview'); if(!el)return;
-    // Show first clip text as preview
-    const proj=App.currentProject();
-    const firstText=proj?.clips?.[0]?.text || _state.sourceText.split('\n')[0] || '';
-    if(!firstText){ el.innerHTML=''; return; }
-    const readingsMap=Object.fromEntries(_state.entries.filter(e=>e.reading).map(e=>[e.surface,e.reading]));
-    const converted=Utils.applyReadings(firstText,readingsMap);
-    let html=Utils.escapeHtml(converted).replace(
-      /[\u4E00-\u9FFF\u3400-\u4DBF]+/g,
-      m=>`<span style="background:var(--bg-error-soft);color:var(--text-error);padding:1px 3px;border-radius:3px">${Utils.escapeHtml(m)}</span>`
-    );
-    el.innerHTML=html;
-  }
-
-  function _kanji(s){ return /[\u4E00-\u9FFF\u3400-\u4DBF]/.test(s); }
-  function _kata2hira(s){ return String(s||'').replace(/[\u30A1-\u30F6]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)); }
-
-  return { analyze, updateReading, removeEntry, saveToProject, getEntries };
+  function now() { return new Date().toISOString(); }
+  return { init, createProject, currentProject, scheduleSave, saveNow, _set, _updateHeader };
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -791,32 +623,38 @@ const KanjiAnalysis = (() => {
 // ─────────────────────────────────────────────────────────────────────────────
 const TTS = (() => {
   async function convertClip(project, clip) {
-    const proxyUrl=(Settings.get('tts.proxyUrl')||'').replace(/\/$/,'');
-    const apiKey=Settings.get('tts.apiKey');
-    const model=Settings.get('tts.model')||'gemini-2.5-flash-preview-tts';
-    if(!proxyUrl||!apiKey) throw new Error('설정(Worker URL/API Key)이 없습니다. #setup을 확인해주세요.');
+    const proxyUrl = (Settings.get('tts.proxyUrl') || '').replace(/\/$/, '');
+    const apiKey   = Settings.get('tts.apiKey');
+    const model    = Settings.get('tts.model') || 'gemini-3.1-flash-tts-preview';
+    if (!proxyUrl || !apiKey) throw new Error('설정(Worker URL/API Key)이 없습니다. #setup을 확인해주세요.');
 
-    const speaker=project.speakers.find(s=>s.id===clip.speakerId);
-    const voice=speaker?.voice||'Charon';
-    const tone=clip.toneOverride||speaker?.tone||'';
-    const readings={...project.kanjiReadings,...(clip.kanjiOverride||{})};
-    const ttsText=Utils.applyReadings(clip.text,readings);
-    const promptText=tone?`${tone}: ${ttsText}`:ttsText;
+    const voice = project.narrator?.voice || 'Charon';
+    const tone  = clip.toneOverride || project.narrator?.baseTone || '';
 
-    const body={
-      contents:[{parts:[{text:promptText}]}],
-      generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voice}}}},
+    // Apply user dict (longest match first)
+    let text = clip.text;
+    const readings = project.kanjiReadings || {};
+    const sorted = Object.entries(readings).filter(([,r])=>r).sort(([a],[b])=>b.length-a.length);
+    for (const [surface, reading] of sorted) text = text.replaceAll(surface, reading);
+
+    const promptText = tone ? `${tone}: ${text}` : text;
+
+    const body = {
+      contents: [{ parts: [{ text: promptText }] }],
+      generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } },
     };
-    const res=await fetch(`${proxyUrl}/v1beta/models/${model}:generateContent`,{
-      method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':apiKey},body:JSON.stringify(body),
+    const res = await fetch(`${proxyUrl}/v1beta/models/${model}:generateContent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': apiKey },
+      body: JSON.stringify(body),
     });
-    if(!res.ok){ const t=await res.text(); throw new Error(`API ${res.status}: ${t.slice(0,200)}`); }
-    const json=await res.json();
-    const part=json?.candidates?.[0]?.content?.parts?.[0];
-    const b64=part?.inlineData?.data;
-    if(!b64) throw new Error('응답에 오디오 없음');
-    const sr=AudioUtils.parsePcmRate(part?.inlineData?.mimeType||'')||24000;
-    return AudioUtils.pcmToWav(AudioUtils.base64ToBytes(b64),sr,1,16);
+    if (!res.ok) { const t=await res.text(); throw new Error(`API ${res.status}: ${t.slice(0,200)}`); }
+    const json = await res.json();
+    const part = json?.candidates?.[0]?.content?.parts?.[0];
+    const b64  = part?.inlineData?.data;
+    if (!b64) throw new Error('응답에 오디오 없음');
+    const sr = AudioUtils.parsePcmRate(part?.inlineData?.mimeType || '') || 24000;
+    return AudioUtils.pcmToWav(AudioUtils.base64ToBytes(b64), sr, 1, 16);
   }
   return { convertClip };
 })();
@@ -829,43 +667,43 @@ const BatchQueue = (() => {
   let _queue=[], _running=new Set(), _stopped=false;
 
   function enqueue(ids) {
-    _stopped=false;
-    const news=ids.filter(id=>!_running.has(id)&&!_queue.includes(id));
+    _stopped = false;
+    const news = ids.filter(id => !_running.has(id) && !_queue.includes(id));
     _queue.push(...news);
     _pump();
   }
 
   function _pump() {
-    while(_running.size<MAX && _queue.length>0) {
-      const id=_queue.shift();
+    while (_running.size < MAX && _queue.length > 0) {
+      const id = _queue.shift();
       _running.add(id);
-      _run(id).finally(()=>{ _running.delete(id); WorkbenchView.updateToolbar(); _pump(); });
+      _run(id).finally(() => { _running.delete(id); WorkbenchView.updateToolbar(); _pump(); });
     }
   }
 
   async function _run(clipId) {
-    const proj=App.currentProject();
-    const clip=proj?.clips.find(c=>c.id===clipId);
-    if(!clip||_stopped) return;
-    for(let attempt=0;attempt<=RETRIES;attempt++){
-      if(_stopped) return;
-      if(attempt>0) await new Promise(r=>setTimeout(r,900*attempt));
+    const proj = App.currentProject();
+    const clip = proj?.clips.find(c => c.id === clipId);
+    if (!clip || _stopped) return;
+    for (let attempt = 0; attempt <= RETRIES; attempt++) {
+      if (_stopped) return;
+      if (attempt > 0) await new Promise(r => setTimeout(r, 900 * attempt));
       try {
-        clip.status='loading'; WorkbenchView.updateCard(clipId);
-        const wav=await TTS.convertClip(proj,clip);
-        const key=`${proj.id}/${clip.id}`;
-        await Storage.put('audioBlobs',{key,blob:wav});
-        clip.audioBlobKey=key; clip.status='done'; clip.lastConvertedAt=new Date().toISOString();
+        clip.status = 'loading'; WorkbenchView.updateCard(clipId);
+        const wav = await TTS.convertClip(proj, clip);
+        const key = `${proj.id}/${clip.id}`;
+        await Storage.put('audioBlobs', { key, blob: wav });
+        clip.audioBlobKey = key; clip.status = 'done'; clip.lastConvertedAt = new Date().toISOString();
         App.scheduleSave(); WorkbenchView.updateCard(clipId);
         return;
-      } catch(err) {
-        if(attempt===RETRIES){ clip.status='redo'; clip.note=err.message; App.scheduleSave(); WorkbenchView.updateCard(clipId); }
+      } catch (err) {
+        if (attempt === RETRIES) { clip.status='redo'; clip.note=err.message; App.scheduleSave(); WorkbenchView.updateCard(clipId); }
       }
     }
   }
 
   function stop() { _stopped=true; _queue=[]; }
-  function activeCount() { return _running.size+_queue.length; }
+  function activeCount() { return _running.size + _queue.length; }
   return { enqueue, stop, activeCount };
 })();
 
@@ -874,16 +712,16 @@ const BatchQueue = (() => {
 // ─────────────────────────────────────────────────────────────────────────────
 const Modal = (() => {
   function open(title, html) {
-    document.getElementById('modalTitle').textContent=title;
-    document.getElementById('modalBody').innerHTML=html;
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalBody').innerHTML = html;
     document.getElementById('modalOverlay').classList.add('show');
   }
   function close() { document.getElementById('modalOverlay').classList.remove('show'); }
   function openProjectList() {
-    Storage.getAll('projects').then(all=>{
-      all.sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));
-      const cur=App.currentProject()?.id;
-      const rows=all.map(p=>`
+    Storage.getAll('projects').then(all => {
+      all.sort((a,b) => b.updatedAt.localeCompare(a.updatedAt));
+      const cur = App.currentProject()?.id;
+      const rows = all.map(p => `
         <div class="project-list-item${p.id===cur?' current':''}" onclick="Modal._switchProject('${Utils.escapeJs(p.id)}')">
           <div>
             <div class="project-list-name">${Utils.escapeHtml(p.name)}</div>
@@ -891,7 +729,7 @@ const Modal = (() => {
           </div>
           <button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();Modal._deleteProject('${Utils.escapeJs(p.id)}')" title="삭제">×</button>
         </div>`).join('');
-      open('프로젝트 목록',`${rows}
+      open('프로젝트 목록', `${rows}
         <hr>
         <button class="btn btn-primary" style="width:100%" onclick="Modal._newProject()">+ 새 프로젝트</button>
         <div style="margin-top:8px;display:flex;gap:6px">
@@ -901,253 +739,220 @@ const Modal = (() => {
     });
   }
   async function _switchProject(id) {
-    const p=await Storage.get('projects',id); if(!p)return;
+    const p = await Storage.get('projects', id); if (!p) return;
     await App.saveNow();
-    App._set?.(p); // internal
-    // Re-set via recreating module state
-    localStorage.setItem('tts.lastProjectId',id);
+    localStorage.setItem('tts.lastProjectId', id);
     location.reload();
   }
   async function _deleteProject(id) {
-    const cur=App.currentProject()?.id;
-    if(id===cur&&(await Storage.getAll('projects')).length===1){ alert('마지막 프로젝트는 삭제할 수 없습니다.'); return; }
-    if(!confirm('이 프로젝트를 삭제할까요?')) return;
-    await Storage.del('projects',id);
-    if(id===cur){ localStorage.removeItem('tts.lastProjectId'); location.reload(); }
+    const cur = App.currentProject()?.id;
+    if (id === cur && (await Storage.getAll('projects')).length === 1) { alert('마지막 프로젝트는 삭제할 수 없습니다.'); return; }
+    if (!confirm('이 프로젝트를 삭제할까요?')) return;
+    await Storage.del('projects', id);
+    if (id === cur) { localStorage.removeItem('tts.lastProjectId'); location.reload(); }
     else openProjectList();
   }
   async function _newProject() {
     await App.saveNow();
-    const p=await App.createProject();
-    location.hash='script'; close(); location.reload();
+    await App.createProject();
+    location.hash = 'script'; close(); location.reload();
   }
   function _exportProject() {
-    const p=App.currentProject(); if(!p)return;
-    const {id,name,createdAt,updatedAt,speakers,kanjiReadings,clips}=p;
-    const data=JSON.stringify({id,name,createdAt,updatedAt,speakers,kanjiReadings,clips},null,2);
-    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));
-    a.download=`${p.name}-${new Date().toISOString().slice(0,10)}.json`;
+    const p = App.currentProject(); if (!p) return;
+    const { id, name, createdAt, updatedAt, narrator, kanjiReadings, clips } = p;
+    const data = JSON.stringify({ id, name, createdAt, updatedAt, narrator, kanjiReadings, clips }, null, 2);
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type:'application/json' }));
+    a.download = `${p.name}-${new Date().toISOString().slice(0,10)}.json`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
   function _importProject() {
-    const inp=document.createElement('input'); inp.type='file'; inp.accept='application/json';
-    inp.onchange=async e=>{
-      const f=e.target.files[0]; if(!f)return;
+    const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
+    inp.onchange = async e => {
+      const f = e.target.files[0]; if (!f) return;
       try {
-        const data=JSON.parse(await f.text());
-        if(!data.clips||!data.speakers) throw new Error('형식 오류');
-        data.id=data.id||crypto.randomUUID(); data.updatedAt=new Date().toISOString();
-        // Reset audio keys (blobs not included)
-        data.clips.forEach(c=>{ c.audioBlobKey=null; c.status=c.status==='done'?'redo':c.status; });
-        await Storage.put('projects',data);
-        localStorage.setItem('tts.lastProjectId',data.id);
+        const data = JSON.parse(await f.text());
+        if (!data.clips || !data.narrator) throw new Error('형식 오류 (narrator 필드 없음)');
+        data.id = data.id || crypto.randomUUID(); data.updatedAt = new Date().toISOString();
+        data.clips.forEach(c => { c.audioBlobKey=null; c.status=c.status==='done'?'redo':c.status; });
+        await Storage.put('projects', data);
+        localStorage.setItem('tts.lastProjectId', data.id);
         location.reload();
-      } catch(err){ alert('가져오기 실패: '+err.message); }
+      } catch (err) { alert('가져오기 실패: ' + err.message); }
     };
     inp.click();
   }
   return { open, close, openProjectList, _switchProject, _deleteProject, _newProject, _exportProject, _importProject };
 })();
 
-// Expose Modal._set for App internal use
-App._set = function(p) {
-  // This is a one-time bridge; the proper way is location.reload()
-  // but for in-session switching we expose this
-};
-
 // ─────────────────────────────────────────────────────────────────────────────
 // MODULE: ScriptView
 // ─────────────────────────────────────────────────────────────────────────────
 const ScriptView = (() => {
   function onEnter() {
-    const proj=App.currentProject(); if(!proj)return;
-    document.getElementById('projectName').value=proj.name;
-    // Reconstruct textarea from clips
-    if(proj.clips.length>0) document.getElementById('scriptText').value=proj.clips.map(c=>c.text).join('\n');
+    const proj = App.currentProject(); if (!proj) return;
+    document.getElementById('projectName').value = proj.name;
+    if (proj.clips.length > 0) {
+      // Reconstruct script with markers
+      document.getElementById('scriptText').value = proj.clips.map(c => `${c.id}\n\n${c.text}`).join('\n\n');
+    }
     updatePreview();
   }
 
   function onNameChange(val) {
-    const proj=App.currentProject(); if(!proj)return;
-    proj.name=val.trim()||'새 프로젝트';
-    document.getElementById('projectNameDisplay').textContent=proj.name;
+    const proj = App.currentProject(); if (!proj) return;
+    proj.name = val.trim() || '새 프로젝트';
+    document.getElementById('projectNameDisplay').textContent = proj.name;
     App.scheduleSave();
   }
 
   function onTextChange() { updatePreview(); }
 
   function updatePreview() {
-    const proj=App.currentProject(); if(!proj)return;
-    const lines=document.getElementById('scriptText').value.split('\n').filter(l=>l.trim());
-    const preview=document.getElementById('scriptPreview');
-    const stats=document.getElementById('scriptStats');
-    if(lines.length===0){
-      preview.innerHTML='<div class="preview-empty">줄을 입력하면 미리보기가 표시됩니다.</div>';
-      if(stats)stats.textContent='0줄';
+    const text = document.getElementById('scriptText').value;
+    const segments = parseScript(text);
+    const preview  = document.getElementById('scriptPreview');
+    const statsBar = document.getElementById('scriptStatsBar');
+
+    if (segments.length === 0) {
+      if (preview) preview.innerHTML = '<div class="preview-empty">마커(1-1, 1-2...)를 포함한 대본을 입력하면 미리보기가 표시됩니다.</div>';
+      if (statsBar) statsBar.innerHTML = '';
       return;
     }
-    const chars=lines.reduce((s,l)=>s+l.trim().length,0);
-    if(stats)stats.textContent=`${lines.length}줄 / ${chars}자`;
-    const sp=proj.speakers;
-    preview.innerHTML=lines.map((line,i)=>{
-      const speaker=sp[i%sp.length];
-      const c=SPEAKER_COLORS[speaker?.color??i%5];
+
+    // Chapter breakdown
+    const chapterCounts = {};
+    segments.forEach(s => { chapterCounts[s.chapterIndex] = (chapterCounts[s.chapterIndex] || 0) + 1; });
+    const chapSummary = Object.entries(chapterCounts)
+      .sort(([a],[b]) => Number(a)-Number(b))
+      .map(([ch, n]) => `Ch${ch}: ${n}개`).join(' · ');
+
+    if (statsBar) statsBar.innerHTML = `<strong>${segments.length}개</strong> 단락 감지됨 &nbsp;·&nbsp; ${Utils.escapeHtml(chapSummary)}`;
+
+    if (preview) preview.innerHTML = segments.map(s => {
+      const preview1 = s.text.replace(/\n/g, ' ').slice(0, 42);
       return `<div class="preview-item">
-        <span class="preview-num">${String(i+1).padStart(2,'0')}</span>
-        <span class="preview-dot" style="background:${c.text}"></span>
-        <span class="preview-speaker" style="color:${c.text}">${Utils.escapeHtml(speaker?.name||'?')}</span>
-        <span class="preview-text">${Utils.escapeHtml(line.trim().slice(0,38))}${line.trim().length>38?'…':''}</span>
+        <span class="preview-num">${Utils.escapeHtml(s.id)}</span>
+        <span class="preview-text">${Utils.escapeHtml(preview1)}${s.text.length > 42 ? '…' : ''}</span>
       </div>`;
     }).join('');
   }
 
   function onNext() {
-    const proj=App.currentProject(); if(!proj)return;
-    const lines=document.getElementById('scriptText').value.split('\n').filter(l=>l.trim());
-    if(lines.length===0){ alert('대본을 입력해주세요.'); return; }
-
-    // Update project name
-    proj.name=document.getElementById('projectName').value.trim()||'새 프로젝트';
-    document.getElementById('projectNameDisplay').textContent=proj.name;
-
-    // Sync clips: preserve existing clips' settings by ID; create new for added lines
-    const sp=proj.speakers;
-    proj.clips=lines.map((line,i)=>{
-      const id=String(i+1).padStart(2,'0');
-      const existing=proj.clips.find(c=>c.id===id);
-      if(existing){ existing.text=line.trim(); return existing; }
-      return { id, text:line.trim(), speakerId:sp[i%sp.length]?.id||sp[0]?.id||'',
-        toneOverride:null, kanjiOverride:null, status:'todo',
-        audioBlobKey:null, audioMimeType:null, note:null, lastConvertedAt:null };
-    });
-    App.scheduleSave();
-    location.hash='speakers';
-  }
-
-  return { onEnter, onNameChange, onTextChange, onNext };
-})();
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MODULE: SpeakersView
-// ─────────────────────────────────────────────────────────────────────────────
-const SpeakersView = (() => {
-  function onEnter() { render(); }
-
-  function render() {
-    const proj=App.currentProject(); if(!proj)return;
-    const container=document.getElementById('speakersList');
-    const addBtn=document.getElementById('addSpeakerBtn');
-    container.innerHTML=proj.speakers.map((sp,i)=>_cardHTML(sp,i)).join('');
-    if(addBtn)addBtn.style.display=proj.speakers.length>=5?'none':'inline-flex';
-  }
-
-  function _cardHTML(sp,idx) {
-    const c=SPEAKER_COLORS[sp.color??idx%5];
-    const voiceOpts=VOICES.map(([v,l])=>`<option value="${v}"${sp.voice===v?' selected':''}>${Utils.escapeHtml(l)}</option>`).join('');
-    const presets=TONE_PRESETS.map(p=>`<button class="tone-preset-chip" onclick="SpeakersView.addTonePreset('${Utils.escapeJs(sp.id)}','${Utils.escapeJs(p)}')">${p}</button>`).join('');
-    return `<div class="speaker-card" data-speaker-id="${sp.id}">
-      <div class="speaker-card-head">
-        <span class="speaker-color-dot" style="background:${c.text}"></span>
-        <input class="input" style="flex:1" value="${Utils.escapeHtml(sp.name)}" placeholder="화자 이름"
-          oninput="SpeakersView.updateField('${Utils.escapeJs(sp.id)}','name',this.value)">
-        <select class="select" style="width:160px" onchange="SpeakersView.updateField('${Utils.escapeJs(sp.id)}','voice',this.value)">${voiceOpts}</select>
-        <button class="btn btn-sm" onclick="SpeakersView.testSpeaker('${Utils.escapeJs(sp.id)}')" title="시연">▶ 시연</button>
-        ${idx>0?`<button class="btn btn-sm btn-ghost btn-danger" onclick="SpeakersView.removeSpeaker('${Utils.escapeJs(sp.id)}')" title="삭제">×</button>`:''}
-      </div>
-      <div class="field">
-        <label class="field-label">톤 지시 <span class="small">(자연어)</span></label>
-        <textarea class="textarea" style="min-height:56px" placeholder="예: 차분하고 낮은 남성의 목소리로"
-          oninput="SpeakersView.updateField('${Utils.escapeJs(sp.id)}','tone',this.value)">${Utils.escapeHtml(sp.tone||'')}</textarea>
-        <div class="tone-presets">${presets}</div>
-      </div>
-    </div>`;
-  }
-
-  function updateField(id,field,value) {
-    const proj=App.currentProject(); if(!proj)return;
-    const sp=proj.speakers.find(s=>s.id===id); if(!sp)return;
-    sp[field]=value; App.scheduleSave();
-    if(field==='name') ScriptView.updatePreview();
-  }
-
-  function addTonePreset(id,preset) {
-    const proj=App.currentProject(); if(!proj)return;
-    const sp=proj.speakers.find(s=>s.id===id); if(!sp)return;
-    sp.tone=(sp.tone?sp.tone+', ':'')+preset;
-    App.scheduleSave(); render();
-  }
-
-  function addSpeaker() {
-    const proj=App.currentProject(); if(!proj||proj.speakers.length>=5)return;
-    proj.speakers.push({id:crypto.randomUUID(),name:`화자 ${proj.speakers.length+1}`,voice:'Puck',tone:'',color:proj.speakers.length});
-    App.scheduleSave(); render();
-  }
-
-  function removeSpeaker(id) {
-    const proj=App.currentProject(); if(!proj||proj.speakers.length<=1)return;
-    if(!confirm('이 화자를 삭제할까요?'))return;
-    proj.speakers=proj.speakers.filter(s=>s.id!==id);
-    // Reassign clips using deleted speaker to first speaker
-    const firstId=proj.speakers[0].id;
-    proj.clips.forEach(c=>{ if(c.speakerId===id)c.speakerId=firstId; });
-    App.scheduleSave(); render();
-  }
-
-  async function testSpeaker(id) {
-    const proj=App.currentProject(); if(!proj)return;
-    if(!Settings.get('tts.proxyUrl')||!Settings.get('tts.apiKey')){ alert('설정 화면에서 Worker URL과 API Key를 먼저 저장해주세요.'); return; }
-    const sp=proj.speakers.find(s=>s.id===id); if(!sp)return;
-    const btn=document.querySelector(`.speaker-card[data-speaker-id="${id}"] button[title="시연"]`);
-    if(btn){btn.disabled=true;btn.textContent='…';}
-    try {
-      const wav=await TTS.convertClip(proj,{id:'test',text:'こんにちは、テストです。',speakerId:id,toneOverride:null,kanjiOverride:null});
-      const url=URL.createObjectURL(wav);
-      const audio=new Audio(url); audio.onended=()=>URL.revokeObjectURL(url); audio.play();
-    } catch(e){ alert(`시연 실패: ${e.message}`); }
-    finally{ if(btn){btn.disabled=false;btn.textContent='▶ 시연';} }
-  }
-
-  function onNext() {
-    // Save speaker data (already auto-saved via oninput)
-    App.saveNow();
-    location.hash='kanji';
-  }
-
-  return { onEnter, render, updateField, addTonePreset, addSpeaker, removeSpeaker, testSpeaker, onNext };
-})();
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MODULE: KanjiView
-// ─────────────────────────────────────────────────────────────────────────────
-const KanjiView = (() => {
-  function onEnter() {
-    Tokenizer.init();
-    const proj=App.currentProject();
-    const info=document.getElementById('kanjiAnalyzeInfo');
-    if(proj&&info) info.textContent=`(${proj.clips.length}개 클립, 전체 대본 기준)`;
-    // If project already has kanji readings, show them
-    if(proj&&Object.keys(proj.kanjiReadings).length>0&&KanjiAnalysis.getEntries().length===0){
-      // Re-analyze silently if we have a source text
-      const fullText=proj.clips.map(c=>c.text).join('\n');
-      if(fullText.trim()) KanjiAnalysis.analyze(fullText);
+    const proj = App.currentProject(); if (!proj) return;
+    const text = document.getElementById('scriptText').value;
+    const segments = parseScript(text);
+    if (segments.length === 0) {
+      alert('대본을 입력해주세요.\n\n형식 예시:\n1-1\n\n나레이션 텍스트...\n\n1-2\n\n다음 단락...');
+      return;
     }
+
+    proj.name = document.getElementById('projectName').value.trim() || '새 프로젝트';
+    document.getElementById('projectNameDisplay').textContent = proj.name;
+
+    // Sync clips: preserve existing (by id), create new
+    const existingMap = new Map(proj.clips.map(c => [c.id, c]));
+    proj.clips = segments.map(seg => {
+      const existing = existingMap.get(seg.id);
+      if (existing) {
+        existing.text = seg.text;
+        existing.chapterIndex = seg.chapterIndex;
+        existing.subIndex = seg.subIndex;
+        return existing;
+      }
+      return {
+        id: seg.id,
+        chapterIndex: seg.chapterIndex,
+        subIndex: seg.subIndex,
+        text: seg.text,
+        toneOverride: null,
+        status: 'todo',
+        audioBlobKey: null,
+        audioMimeType: null,
+        note: null,
+        lastConvertedAt: null,
+      };
+    });
+
+    App.scheduleSave();
+    location.hash = 'narrator';
   }
 
-  async function analyze() {
-    const proj=App.currentProject();
-    if(!proj||proj.clips.length===0){ alert('대본 단계에서 클립을 먼저 입력해주세요.'); return; }
-    const fullText=proj.clips.map(c=>c.text).join('\n');
-    await KanjiAnalysis.analyze(fullText);
+  return { onEnter, onNameChange, onTextChange, onNext, updatePreview };
+})();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MODULE: NarratorView
+// ─────────────────────────────────────────────────────────────────────────────
+const NarratorView = (() => {
+  function onEnter() {
+    const proj = App.currentProject(); if (!proj) return;
+    const narrator = proj.narrator || { voice: 'Charon', baseTone: DEFAULT_NARRATOR_TONE };
+
+    const voiceSel = document.getElementById('narratorVoice');
+    voiceSel.innerHTML = VOICES.map(([v,l]) =>
+      `<option value="${v}"${narrator.voice === v ? ' selected' : ''}>${Utils.escapeHtml(l)}</option>`
+    ).join('');
+
+    document.getElementById('narratorTone').value = narrator.baseTone || '';
+
+    const presetsEl = document.getElementById('narratorTonePresets');
+    presetsEl.innerHTML = TONE_PRESETS.map(p =>
+      `<button class="tone-preset-chip" onclick="NarratorView.addPreset('${Utils.escapeJs(p)}')">${p}</button>`
+    ).join('');
   }
 
-  function onNext() {
-    KanjiAnalysis.saveToProject();
-    App.saveNow();
-    location.hash='workbench';
+  function save() {
+    const proj = App.currentProject(); if (!proj) return;
+    if (!proj.narrator) proj.narrator = { voice: 'Charon', baseTone: '' };
+    proj.narrator.voice    = document.getElementById('narratorVoice').value;
+    proj.narrator.baseTone = document.getElementById('narratorTone').value.trim();
+    App.scheduleSave();
   }
 
-  return { onEnter, analyze, onNext };
+  function addPreset(preset) {
+    const ta = document.getElementById('narratorTone');
+    ta.value = (ta.value ? ta.value + ', ' : '') + preset;
+    save();
+  }
+
+  async function test() {
+    const proj = App.currentProject(); if (!proj) return;
+    if (!Settings.get('tts.proxyUrl') || !Settings.get('tts.apiKey')) {
+      alert('설정 화면에서 Worker URL과 API Key를 먼저 저장해주세요.'); return;
+    }
+    save();
+    const btn = document.getElementById('narratorTestBtn');
+    if (btn) { btn.disabled=true; btn.textContent='…'; }
+    try {
+      const testClip = { id:'test', chapterIndex:0, subIndex:0, text:'こんにちは、テストです。', toneOverride:null, status:'todo', audioBlobKey:null, audioMimeType:null, note:null, lastConvertedAt:null };
+      const wav = await TTS.convertClip(proj, testClip);
+      const url = URL.createObjectURL(wav);
+      const audio = new Audio(url); audio.onended = () => URL.revokeObjectURL(url); audio.play();
+    } catch (e) { alert(`시연 실패: ${e.message}`); }
+    finally { if (btn) { btn.disabled=false; btn.textContent='▶ 시연'; } }
+  }
+
+  return { onEnter, save, addPreset, test };
+})();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MODULE: DictionaryView
+// ─────────────────────────────────────────────────────────────────────────────
+const DictionaryView = (() => {
+  function onEnter() { UserDict.refresh(); }
+
+  function addEntry() {
+    const surface = document.getElementById('dictSurface').value.trim();
+    const reading = document.getElementById('dictReading').value.trim();
+    if (!surface || !reading) { alert('단어와 읽기를 모두 입력해주세요.'); return; }
+    UserDict.set(surface, reading);
+    document.getElementById('dictSurface').value = '';
+    document.getElementById('dictReading').value = '';
+    document.getElementById('dictSurface').focus();
+  }
+
+  return { onEnter, addEntry };
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1155,8 +960,8 @@ const KanjiView = (() => {
 // ─────────────────────────────────────────────────────────────────────────────
 const WorkbenchView = (() => {
   let _filter='all';
-  let _audioUrls=new Map(); // clipId → objectURL
-  let _selected=new Set();
+  let _audioUrls = new Map();
+  let _selected  = new Set();
 
   function onEnter() {
     _selected.clear();
@@ -1166,209 +971,221 @@ const WorkbenchView = (() => {
   }
 
   function setFilter(f) {
-    _filter=f;
-    document.querySelectorAll('.filter-tab').forEach(t=>t.classList.toggle('active',t.dataset.filter===f));
+    _filter = f;
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.toggle('active', t.dataset.filter === f));
     render();
   }
 
   function render() {
-    const proj=App.currentProject();
-    const grid=document.getElementById('clipGrid'); if(!grid)return;
-    if(!proj||proj.clips.length===0){
-      grid.innerHTML='<div style="padding:32px;text-align:center;color:var(--text-tertiary);font-size:13px;grid-column:1/-1">대본 단계에서 클립을 먼저 입력해주세요.</div>';
+    const proj = App.currentProject();
+    const grid = document.getElementById('clipGrid'); if (!grid) return;
+    if (!proj || proj.clips.length === 0) {
+      grid.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-tertiary);font-size:13px;grid-column:1/-1">대본 단계에서 클립을 먼저 입력해주세요.</div>';
       return;
     }
-    const clips=_filter==='all'?proj.clips:proj.clips.filter(c=>c.status===_filter);
-    if(clips.length===0){ grid.innerHTML='<div style="padding:24px;text-align:center;color:var(--text-tertiary);font-size:13px;grid-column:1/-1">해당하는 클립이 없습니다.</div>'; return; }
-    grid.innerHTML=clips.map(c=>_cardHTML(c,proj)).join('');
-    // Restore selection state
-    _selected.forEach(id=>{
-      const cb=document.querySelector(`.cc-check[data-id="${id}"]`);
-      if(cb)cb.checked=true;
-      const card=document.querySelector(`.clip-card[data-clip-id="${id}"]`);
-      if(card)card.classList.add('is-selected');
+    const clips = _filter === 'all' ? proj.clips : proj.clips.filter(c => c.status === _filter);
+    if (clips.length === 0) {
+      grid.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-tertiary);font-size:13px;grid-column:1/-1">해당하는 클립이 없습니다.</div>';
+      return;
+    }
+
+    let lastChapter = null;
+    let html = '';
+    for (const c of clips) {
+      if (c.chapterIndex !== lastChapter) {
+        lastChapter = c.chapterIndex;
+        html += `<div class="chapter-header">Chapter ${c.chapterIndex}</div>`;
+      }
+      html += _cardHTML(c, proj);
+    }
+    grid.innerHTML = html;
+
+    _selected.forEach(id => {
+      const cb   = document.querySelector(`.cc-check[data-id="${id}"]`);   if (cb)   cb.checked = true;
+      const card = document.querySelector(`.clip-card[data-clip-id="${id}"]`); if (card) card.classList.add('is-selected');
     });
   }
 
-  function _cardHTML(clip,proj) {
-    const sp=proj.speakers.find(s=>s.id===clip.speakerId)||proj.speakers[0];
-    const c=SPEAKER_COLORS[sp?.color??0];
-    const spStyle=`background:${c.bg};color:${c.text};border-color:${c.border}`;
-    const statusLabel={todo:'미작업',loading:'변환 중',done:'완료',redo:'재작업'}[clip.status]||'미작업';
-    const isDone=clip.status==='done';
-    const hasAudio=isDone&&_audioUrls.has(clip.id);
+  function _cardHTML(clip, proj) {
+    const statusLabel = { todo:'미작업', loading:'변환 중', done:'완료', redo:'재작업' }[clip.status] || '미작업';
+    const isDone  = clip.status === 'done';
+    const hasAudio = isDone && _audioUrls.has(clip.id);
+    const baseTone = proj.narrator?.baseTone || '';
     return `<div class="clip-card" data-clip-id="${clip.id}">
       <div class="cc-head">
         <input type="checkbox" class="cc-check" data-id="${clip.id}"
           onchange="WorkbenchView.onCheck('${clip.id}',this.checked)">
-        <span class="cc-id">${clip.id}</span>
+        <span class="cc-id">${Utils.escapeHtml(clip.id)}</span>
         <span class="cc-status ${clip.status}">${clip.status==='loading'?'<span class="spinner"></span>':''} ${statusLabel}</span>
-        <button class="cc-speaker-pill" style="${spStyle}" onclick="WorkbenchView.cycleSpeaker('${clip.id}')" title="클릭하여 화자 변경">
-          ${Utils.escapeHtml(sp?.name||'?')}
-        </button>
       </div>
       <div class="cc-text">${Utils.escapeHtml(clip.text)}</div>
       <div class="cc-tone-row">
         <span class="cc-label">톤</span>
         <input class="input cc-tone-input" type="text" value="${Utils.escapeHtml(clip.toneOverride||'')}"
-          placeholder="${Utils.escapeHtml(sp?.tone||'화자 기본값')}"
+          placeholder="${Utils.escapeHtml(baseTone ? baseTone.slice(0,30)+'…' : '나레이터 기본값')}"
           onchange="WorkbenchView.saveToneOverride('${clip.id}',this.value)">
       </div>
-      ${hasAudio?`<div class="cc-audio"><audio id="player-${clip.id}" src="${_audioUrls.get(clip.id)}" controls></audio></div>`:''}
-      ${clip.note&&clip.status==='redo'?`<div class="small" style="color:var(--text-warning)">${Utils.escapeHtml(clip.note.slice(0,80))}</div>`:''}
+      ${hasAudio ? `<div class="cc-audio"><audio id="player-${clip.id}" src="${_audioUrls.get(clip.id)}" controls></audio></div>` : ''}
+      ${clip.note && clip.status==='redo' ? `<div class="small" style="color:var(--text-warning)">${Utils.escapeHtml(clip.note.slice(0,80))}</div>` : ''}
       <div class="cc-actions">
-        <button class="btn btn-sm${isDone?' ':' btn-primary '}" onclick="WorkbenchView.convertOne('${clip.id}')">${isDone?'재변환':'변환'}</button>
-        ${isDone?`<button class="btn btn-sm" onclick="WorkbenchView.downloadOne('${clip.id}')">↓ wav</button>`:''}
+        <button class="btn btn-sm${isDone?'':' btn-primary'}" onclick="WorkbenchView.convertOne('${clip.id}')">${isDone?'재변환':'변환'}</button>
+        ${isDone ? `<button class="btn btn-sm" onclick="WorkbenchView.downloadOne('${clip.id}')">↓ wav</button>` : ''}
       </div>
     </div>`;
   }
 
   function updateCard(clipId) {
-    const proj=App.currentProject(); if(!proj)return;
-    const card=document.querySelector(`.clip-card[data-clip-id="${clipId}"]`);
-    if(!card)return;
-    const clip=proj.clips.find(c=>c.id===clipId); if(!clip)return;
-    if(_filter!=='all'&&clip.status!==_filter){ card.remove(); updateToolbar(); return; }
-    // Re-check audio
-    if(clip.status==='done'&&!_audioUrls.has(clipId)) _loadAudio(clipId).then(()=>updateCard(clipId));
-    else { const tmp=document.createElement('div'); tmp.innerHTML=_cardHTML(clip,proj); card.replaceWith(tmp.firstElementChild); }
-    // Restore checkbox
-    if(_selected.has(clipId)){
-      const cb=document.querySelector(`.cc-check[data-id="${clipId}"]`); if(cb)cb.checked=true;
-      const c=document.querySelector(`.clip-card[data-clip-id="${clipId}"]`); if(c)c.classList.add('is-selected');
+    const proj = App.currentProject(); if (!proj) return;
+    const card = document.querySelector(`.clip-card[data-clip-id="${clipId}"]`); if (!card) return;
+    const clip = proj.clips.find(c => c.id === clipId); if (!clip) return;
+    if (_filter !== 'all' && clip.status !== _filter) { card.remove(); updateToolbar(); return; }
+    if (clip.status === 'done' && !_audioUrls.has(clipId)) {
+      _loadAudio(clipId).then(() => updateCard(clipId));
+    } else {
+      const tmp = document.createElement('div'); tmp.innerHTML = _cardHTML(clip, proj);
+      card.replaceWith(tmp.firstElementChild);
+    }
+    if (_selected.has(clipId)) {
+      const cb   = document.querySelector(`.cc-check[data-id="${clipId}"]`);   if (cb)   cb.checked = true;
+      const c    = document.querySelector(`.clip-card[data-clip-id="${clipId}"]`); if (c) c.classList.add('is-selected');
     }
     updateToolbar();
   }
 
   async function _loadAudio(clipId) {
-    const proj=App.currentProject(); if(!proj)return;
-    const clip=proj.clips.find(c=>c.id===clipId); if(!clip?.audioBlobKey)return;
-    const rec=await Storage.get('audioBlobs',clip.audioBlobKey); if(!rec?.blob)return;
-    if(_audioUrls.has(clipId)) URL.revokeObjectURL(_audioUrls.get(clipId));
-    _audioUrls.set(clipId,URL.createObjectURL(rec.blob));
+    const proj = App.currentProject(); if (!proj) return;
+    const clip = proj.clips.find(c => c.id === clipId); if (!clip?.audioBlobKey) return;
+    const rec  = await Storage.get('audioBlobs', clip.audioBlobKey); if (!rec?.blob) return;
+    if (_audioUrls.has(clipId)) URL.revokeObjectURL(_audioUrls.get(clipId));
+    _audioUrls.set(clipId, URL.createObjectURL(rec.blob));
   }
 
   function _loadAllAudio() {
-    const proj=App.currentProject(); if(!proj)return;
-    proj.clips.filter(c=>c.status==='done'&&c.audioBlobKey).forEach(c=>_loadAudio(c.id));
+    const proj = App.currentProject(); if (!proj) return;
+    proj.clips.filter(c => c.status === 'done' && c.audioBlobKey).forEach(c => _loadAudio(c.id));
   }
 
   function updateToolbar() {
-    const proj=App.currentProject(); if(!proj)return;
-    const total=proj.clips.length, done=proj.clips.filter(c=>c.status==='done').length;
-    const pct=total>0?Math.round(done/total*100):0;
-    const pt=document.getElementById('progressText'); if(pt)pt.textContent=`${done} / ${total} 완료`;
-    const pf=document.getElementById('progressFill'); if(pf)pf.style.width=pct+'%';
-    const n=_selected.size;
-    const bb=document.getElementById('batchConvertBtn'); if(bb)bb.textContent=`선택 ${n}개 변환`;
-    const ce=document.getElementById('costEstimate'); if(ce)ce.textContent=n>0?`예상 $${(n*0.001).toFixed(3)} 미만`:'';
+    const proj  = App.currentProject(); if (!proj) return;
+    const total = proj.clips.length;
+    const done  = proj.clips.filter(c => c.status === 'done').length;
+    const pct   = total > 0 ? Math.round(done / total * 100) : 0;
+    const pt = document.getElementById('progressText'); if (pt) pt.textContent = `${done} / ${total} 완료`;
+    const pf = document.getElementById('progressFill'); if (pf) pf.style.width = pct + '%';
+    const n  = _selected.size;
+    const bb = document.getElementById('batchConvertBtn'); if (bb) bb.textContent = `선택 ${n}개 변환`;
+    const ce = document.getElementById('costEstimate'); if (ce) ce.textContent = n > 0 ? `예상 $${(n*0.001).toFixed(3)} 미만` : '';
   }
 
-  function onCheck(clipId,checked) {
-    if(checked){_selected.add(clipId);} else {_selected.delete(clipId);}
-    const card=document.querySelector(`.clip-card[data-clip-id="${clipId}"]`);
-    if(card)card.classList.toggle('is-selected',checked);
+  function onCheck(clipId, checked) {
+    if (checked) _selected.add(clipId); else _selected.delete(clipId);
+    const card = document.querySelector(`.clip-card[data-clip-id="${clipId}"]`);
+    if (card) card.classList.toggle('is-selected', checked);
     updateToolbar();
-    // Update "select all" checkbox state
-    const proj=App.currentProject(); if(!proj)return;
-    const allIds=proj.clips.map(c=>c.id);
-    const allChecked=allIds.every(id=>_selected.has(id));
-    const sa=document.getElementById('selectAll'); if(sa)sa.checked=allChecked;
+    const proj = App.currentProject(); if (!proj) return;
+    const allChecked = proj.clips.every(c => _selected.has(c.id));
+    const sa = document.getElementById('selectAll'); if (sa) sa.checked = allChecked;
   }
 
   function toggleSelectAll(checked) {
-    const proj=App.currentProject(); if(!proj)return;
-    const visibleIds=Array.from(document.querySelectorAll('.cc-check')).map(el=>el.dataset.id);
-    visibleIds.forEach(id=>{ if(checked)_selected.add(id);else _selected.delete(id); });
-    document.querySelectorAll('.cc-check').forEach(cb=>cb.checked=checked);
-    document.querySelectorAll('.clip-card').forEach(c=>c.classList.toggle('is-selected',checked));
+    const visibleIds = Array.from(document.querySelectorAll('.cc-check')).map(el => el.dataset.id);
+    visibleIds.forEach(id => { if (checked) _selected.add(id); else _selected.delete(id); });
+    document.querySelectorAll('.cc-check').forEach(cb => cb.checked = checked);
+    document.querySelectorAll('.clip-card').forEach(c => c.classList.toggle('is-selected', checked));
     updateToolbar();
   }
 
-  function cycleSpeaker(clipId) {
-    const proj=App.currentProject(); if(!proj)return;
-    const clip=proj.clips.find(c=>c.id===clipId); if(!clip)return;
-    const idx=proj.speakers.findIndex(s=>s.id===clip.speakerId);
-    clip.speakerId=proj.speakers[(idx+1)%proj.speakers.length].id;
-    App.scheduleSave(); updateCard(clipId);
+  function saveToneOverride(clipId, val) {
+    const proj = App.currentProject(); if (!proj) return;
+    const clip = proj.clips.find(c => c.id === clipId); if (!clip) return;
+    clip.toneOverride = val.trim() || null;
+    App.scheduleSave();
   }
 
-  function saveToneOverride(clipId,val) {
-    const proj=App.currentProject(); if(!proj)return;
-    const clip=proj.clips.find(c=>c.id===clipId); if(!clip)return;
-    clip.toneOverride=val.trim()||null; App.scheduleSave();
-  }
-
-  function convertOne(clipId) {
-    BatchQueue.enqueue([clipId]);
-  }
+  function convertOne(clipId) { BatchQueue.enqueue([clipId]); }
 
   function batchConvert() {
-    if(_selected.size===0){ alert('변환할 클립을 선택해주세요.'); return; }
+    if (_selected.size === 0) { alert('변환할 클립을 선택해주세요.'); return; }
     BatchQueue.enqueue([..._selected]);
   }
 
   async function downloadOne(clipId) {
-    const proj=App.currentProject(); if(!proj)return;
-    const clip=proj.clips.find(c=>c.id===clipId); if(!clip?.audioBlobKey)return;
-    const rec=await Storage.get('audioBlobs',clip.audioBlobKey); if(!rec?.blob){alert('오디오 없음');return;}
-    const a=document.createElement('a'); a.href=URL.createObjectURL(rec.blob); a.download=`${clip.id}.wav`;
+    const proj = App.currentProject(); if (!proj) return;
+    const clip = proj.clips.find(c => c.id === clipId); if (!clip?.audioBlobKey) return;
+    const rec  = await Storage.get('audioBlobs', clip.audioBlobKey); if (!rec?.blob) { alert('오디오 없음'); return; }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(rec.blob);
+    a.download = _wavName(clip, proj.clips);
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
 
   async function downloadZip() {
-    const proj=App.currentProject(); if(!proj)return;
-    const done=proj.clips.filter(c=>c.status==='done');
-    if(done.length===0){alert('완료된 클립이 없습니다.');return;}
-    const undone=proj.clips.length-done.length;
-    if(undone>0&&!confirm(`${undone}개 클립이 미완료입니다. 완료된 ${done.length}개만 다운로드하시겠어요?`))return;
-    // Lazy-load JSZip
-    if(!window.JSZip){
-      await new Promise((res,rej)=>{
-        const s=document.createElement('script');
-        s.src='https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
-        s.onload=res; s.onerror=rej; document.head.appendChild(s);
+    const proj = App.currentProject(); if (!proj) return;
+    const done = proj.clips.filter(c => c.status === 'done');
+    if (done.length === 0) { alert('완료된 클립이 없습니다.'); return; }
+    const undone = proj.clips.length - done.length;
+    if (undone > 0 && !confirm(`${undone}개 클립이 미완료입니다. 완료된 ${done.length}개만 다운로드하시겠어요?`)) return;
+
+    if (!window.JSZip) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+        s.onload = res; s.onerror = rej; document.head.appendChild(s);
       });
     }
-    const zip=new JSZip();
-    for(const clip of done){
-      const rec=await Storage.get('audioBlobs',`${proj.id}/${clip.id}`);
-      if(rec?.blob) zip.file(`${clip.id}.wav`,await rec.blob.arrayBuffer());
+    const zip = new JSZip();
+    for (const clip of done) {
+      const rec = await Storage.get('audioBlobs', `${proj.id}/${clip.id}`);
+      if (rec?.blob) zip.file(_wavName(clip, proj.clips), await rec.blob.arrayBuffer());
     }
-    const zipBlob=await zip.generateAsync({type:'blob'});
-    const date=new Date().toISOString().slice(0,10);
-    const a=document.createElement('a'); a.href=URL.createObjectURL(zipBlob);
-    a.download=`${proj.name}-${date}.zip`;
+    const zipBlob = await zip.generateAsync({ type:'blob' });
+    const date = new Date().toISOString().slice(0, 10);
+    const a = document.createElement('a'); a.href = URL.createObjectURL(zipBlob);
+    a.download = `${proj.name}-${date}.zip`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   }
 
-  return { onEnter, setFilter, render, updateCard, updateToolbar, onCheck, toggleSelectAll, cycleSpeaker, saveToneOverride, convertOne, batchConvert, downloadOne, downloadZip };
+  // Build WAV filename with auto zero-padding for sorting
+  function _wavName(clip, allClips) {
+    const maxCh  = Math.max(...allClips.map(c => c.chapterIndex || 1));
+    const maxSub = Math.max(...allClips.map(c => c.subIndex || 1));
+    const padCh  = maxCh  >= 10;
+    const padSub = maxSub >= 10;
+    const [chStr, subStr] = clip.id.split('-');
+    const ch  = padCh  ? chStr.padStart(2, '0')  : chStr;
+    const sub = padSub ? subStr.padStart(2, '0') : subStr;
+    return `${ch}-${sub}.wav`;
+  }
+
+  return { onEnter, setFilter, render, updateCard, updateToolbar, onCheck, toggleSelectAll, saveToneOverride, convertOne, batchConvert, downloadOne, downloadZip };
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODULE: Router
 // ─────────────────────────────────────────────────────────────────────────────
 const Router = (() => {
-  const VIEWS=['setup','script','speakers','kanji','workbench'];
-  const ON_ENTER={
-    script:    ()=>ScriptView.onEnter(),
-    speakers:  ()=>SpeakersView.onEnter(),
-    kanji:     ()=>KanjiView.onEnter(),
-    workbench: ()=>WorkbenchView.onEnter(),
+  const VIEWS    = ['setup','script','narrator','dictionary','workbench'];
+  const ON_ENTER = {
+    script:     () => ScriptView.onEnter(),
+    narrator:   () => NarratorView.onEnter(),
+    dictionary: () => DictionaryView.onEnter(),
+    workbench:  () => WorkbenchView.onEnter(),
   };
 
-  function _cur(){ const h=location.hash.slice(1); return VIEWS.includes(h)?h:'setup'; }
+  function _cur() { const h = location.hash.slice(1); return VIEWS.includes(h) ? h : 'setup'; }
 
   function show(step) {
-    VIEWS.forEach(v=>{ const el=document.getElementById(`view-${v}`); if(el)el.classList.toggle('view-active',v===step); });
-    document.querySelectorAll('.step-nav-item').forEach(el=>el.classList.toggle('active',el.dataset.step===step));
+    VIEWS.forEach(v => {
+      const el = document.getElementById(`view-${v}`);
+      if (el) el.classList.toggle('view-active', v === step);
+    });
+    document.querySelectorAll('.step-nav-item').forEach(el => el.classList.toggle('active', el.dataset.step === step));
     ON_ENTER[step]?.();
   }
 
   function init() {
-    window.addEventListener('hashchange',()=>show(_cur()));
+    window.addEventListener('hashchange', () => show(_cur()));
     show(_cur());
   }
 
@@ -1380,7 +1197,7 @@ const Router = (() => {
 // ─────────────────────────────────────────────────────────────────────────────
 Settings.load();
 UserDict.load();
-App.init().then(()=>Router.init());
+App.init().then(() => Router.init());
 </script>
 </body>
 </html>
