@@ -573,8 +573,7 @@
   </main>
 </div>
 
-<!-- kuromoji.js from CDN -->
-<script src="https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js"></script>
+<!-- kuromoji.js is loaded inside a Web Worker (see Tokenizer module) -->
 
 <script>
 'use strict';
@@ -755,52 +754,137 @@ const UserDict = (() => {
 
 // ============================================================
 // MODULE: Tokenizer
-// Wraps kuromoji.js initialization and tokenization.
-// init() is idempotent — safe to call multiple times.
-// Loaded lazily when the script view is first activated,
-// not on page boot, to avoid blocking the main thread.
+// Runs kuromoji inside an inline Web Worker so that dictionary
+// loading and parsing never block the main thread.
+//
+// init()     — idempotent; starts the Worker on first call.
+// tokenize() — Promise<tokens[]>; resolves after Worker reply.
+// isReady()  — true once the Worker has finished building.
+//
+// Lazy-loaded: Router calls init() only when #script is shown.
 // ============================================================
 const Tokenizer = (() => {
-  const DICT_CDN = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/';
-  let _tokenizer = null;
+  // Worker source — kuromoji is loaded inside the Worker via importScripts,
+  // keeping the main thread completely free during the 4 MB download + parse.
+  const WORKER_SRC = `
+    importScripts('https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js');
+
+    var tokenizer = null;
+    var queue = [];           // tokenize requests that arrived before ready
+
+    kuromoji
+      .builder({ dicPath: 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/' })
+      .build(function(err, t) {
+        if (err) {
+          self.postMessage({ type: 'error', error: String(err) });
+        } else {
+          tokenizer = t;
+          self.postMessage({ type: 'ready' });
+          queue.forEach(function(d) { _handle(d); });
+          queue = [];
+        }
+      });
+
+    function _handle(data) {
+      try {
+        var tokens = tokenizer.tokenize(data.text);
+        self.postMessage({ type: 'tokenize-result', id: data.id, tokens: tokens });
+      } catch (e) {
+        self.postMessage({ type: 'tokenize-error', id: data.id, error: String(e) });
+      }
+    }
+
+    self.onmessage = function(e) {
+      if (tokenizer) { _handle(e.data); }
+      else           { queue.push(e.data); }
+    };
+  `;
+
+  let _worker      = null;
+  let _ready       = false;
   let _initStarted = false;
+  let _initPromise = null;
+  let _pending     = new Map();  // id → { resolve, reject }
+  let _nextId      = 0;
 
   function init() {
-    if (_initStarted) return; // already loading or done
+    if (_initStarted) return _initPromise;
     _initStarted = true;
-    _load();
-  }
 
-  async function _load() {
-    const statusEl = document.getElementById('tokenizerStatus');
-    statusEl.style.display = 'flex'; // make visible in case view was hidden
-    try {
-      const t0 = performance.now();
-      _tokenizer = await new Promise((resolve, reject) => {
-        if (typeof kuromoji === 'undefined') {
-          reject(new Error('kuromoji 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인해주세요.'));
-          return;
+    _initPromise = new Promise((resolve, reject) => {
+      // Create worker from inline source (single-file principle)
+      let blobUrl;
+      try {
+        const blob = new Blob([WORKER_SRC], { type: 'text/javascript' });
+        blobUrl = URL.createObjectURL(blob);
+        _worker = new Worker(blobUrl);
+        URL.revokeObjectURL(blobUrl);
+      } catch (err) {
+        _initStarted = false;
+        _setStatus('error', `❌ Worker 생성 실패: ${err.message}`);
+        reject(err);
+        return;
+      }
+
+      _worker.addEventListener('message', (e) => {
+        const { type, error, id, tokens } = e.data;
+
+        if (type === 'ready') {
+          _ready = true;
+          _setStatus('ready', '✓ kuromoji 준비 완료');
+          setTimeout(() => {
+            const el = document.getElementById('tokenizerStatus');
+            if (el) el.style.display = 'none';
+          }, 2000);
+          resolve();
+
+        } else if (type === 'error') {
+          _initStarted = false;
+          _setStatus('error', `❌ kuromoji 로드 실패: ${error}`);
+          reject(new Error(error));
+
+        } else if (type === 'tokenize-result') {
+          const p = _pending.get(id);
+          if (p) { _pending.delete(id); p.resolve(tokens); }
+
+        } else if (type === 'tokenize-error') {
+          const p = _pending.get(id);
+          if (p) { _pending.delete(id); p.reject(new Error(error)); }
         }
-        kuromoji.builder({ dicPath: DICT_CDN }).build((err, t) =>
-          err ? reject(err) : resolve(t)
-        );
       });
-      const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
-      statusEl.className = 'tokenizer-status ready';
-      statusEl.textContent = `✓ kuromoji 준비 완료 (${elapsed}초)`;
-      setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
-    } catch (err) {
-      _initStarted = false; // allow retry on error
-      statusEl.className = 'tokenizer-status error';
-      statusEl.textContent = `❌ kuromoji 로드 실패: ${err.message}`;
-    }
+
+      _worker.addEventListener('error', (e) => {
+        _initStarted = false;
+        const msg = e.message || 'Worker 오류';
+        _setStatus('error', `❌ ${msg}`);
+        reject(new Error(msg));
+      });
+    });
+
+    return _initPromise;
   }
 
+  // Returns Promise<tokens[]>; the Worker processes it off-thread.
   function tokenize(text) {
-    return _tokenizer ? _tokenizer.tokenize(text) : null;
+    return new Promise((resolve, reject) => {
+      if (!_worker) { reject(new Error('Worker가 시작되지 않았습니다.')); return; }
+      const id = _nextId++;
+      _pending.set(id, { resolve, reject });
+      _worker.postMessage({ type: 'tokenize', id, text });
+    });
   }
 
-  function isReady() { return !!_tokenizer; }
+  function _setStatus(cls, text) {
+    const el = document.getElementById('tokenizerStatus');
+    if (!el) return;
+    el.style.display = 'flex';
+    el.className = `tokenizer-status ${cls}`;
+    el.innerHTML = cls === 'loading'
+      ? `<span class="spinner"></span>${text}`
+      : text;
+  }
+
+  function isReady() { return _ready; }
 
   return { init, tokenize, isReady };
 })();
@@ -824,7 +908,7 @@ const KanjiAnalysis = (() => {
     edited:   ['편집됨',  'edited'],
   };
 
-  function analyze() {
+  async function analyze() {
     if (!Tokenizer.isReady()) {
       alert('kuromoji가 아직 준비되지 않았습니다. 잠시만 기다려주세요.');
       return;
@@ -832,24 +916,34 @@ const KanjiAnalysis = (() => {
     const text = document.getElementById('text').value.trim();
     if (!text) { alert('대본을 입력해주세요.'); return; }
 
-    const tokens = Tokenizer.tokenize(text);
-    const seen = new Set();
-    _state.entries = tokens
-      .filter(t => _containsKanji(t.surface_form) && !seen.has(t.surface_form) && seen.add(t.surface_form))
-      .map(t => {
-        const surface = t.surface_form;
-        const dictReading = UserDict.get(surface);
-        if (dictReading) return { surface, reading: dictReading, source: 'dict' };
-        if (t.reading && t.reading !== '*') {
-          return { surface, reading: _kata2hira(t.reading), source: 'kuromoji' };
-        }
-        return { surface, reading: '', source: 'unknown' };
-      });
+    const btn = document.getElementById('analyzeBtn');
+    btn.disabled = true;
+    try {
+      // tokenize() resolves via Worker postMessage — never blocks main thread
+      const tokens = await Tokenizer.tokenize(text);
 
-    _render();
-    updatePreview();
-    document.getElementById('kanjiSection').style.display  = 'block';
-    document.getElementById('conversionCard').style.display = 'block';
+      const seen = new Set();
+      _state.entries = tokens
+        .filter(t => _containsKanji(t.surface_form) && !seen.has(t.surface_form) && seen.add(t.surface_form))
+        .map(t => {
+          const surface = t.surface_form;
+          const dictReading = UserDict.get(surface);
+          if (dictReading) return { surface, reading: dictReading, source: 'dict' };
+          if (t.reading && t.reading !== '*') {
+            return { surface, reading: _kata2hira(t.reading), source: 'kuromoji' };
+          }
+          return { surface, reading: '', source: 'unknown' };
+        });
+
+      _render();
+      updatePreview();
+      document.getElementById('kanjiSection').style.display  = 'block';
+      document.getElementById('conversionCard').style.display = 'block';
+    } catch (err) {
+      alert(`분석 실패: ${err.message}`);
+    } finally {
+      btn.disabled = false;
+    }
   }
 
   function updateReading(idx, value) {
