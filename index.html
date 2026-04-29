@@ -186,11 +186,7 @@
     <section id="view-setup" class="view">
       <div class="card">
         <h2><span class="num">1</span>설정</h2>
-        <p class="card-sub">Cloudflare Worker URL과 Gemini API Key를 저장합니다.</p>
-        <div class="field">
-          <label class="field-label" for="proxyUrl">Cloudflare Worker URL</label>
-          <input class="input" id="proxyUrl" type="url" placeholder="https://tts-proxy.dadamandes.workers.dev" />
-        </div>
+        <p class="card-sub">Gemini API Key를 저장합니다.</p>
         <div class="field">
           <label class="field-label" for="apiKey">Gemini API Key</label>
           <input class="input" id="apiKey" type="password" placeholder="AIza..." autocomplete="off" />
@@ -350,6 +346,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // CONSTANTS
 // ─────────────────────────────────────────────────────────────────────────────
+const WORKER_URL = 'https://tts-proxy.dadamandes.workers.dev';
+
 const VOICES = [
   ['Aoede','Aoede (밝음)'],['Charon','Charon (정보적)'],['Fenrir','Fenrir (흥분된)'],
   ['Kore','Kore (확고함)'],['Leda','Leda (젊음)'],['Orus','Orus (단호함)'],
@@ -425,17 +423,13 @@ const Utils = (() => {
 // ─────────────────────────────────────────────────────────────────────────────
 const Settings = (() => {
   function load() {
-    _el('proxyUrl').value    = _ls('tts.proxyUrl') || '';
-    _el('apiKey').value      = _ls('tts.apiKey')   || '';
-    _el('globalModel').value = _ls('tts.model')    || 'gemini-3.1-flash-tts-preview';
-    if (_ls('tts.proxyUrl') && _ls('tts.apiKey'))
-      _el('savedIndicator').style.display = 'inline';
+    _el('apiKey').value      = _ls('tts.apiKey') || '';
+    _el('globalModel').value = _ls('tts.model')  || 'gemini-3.1-flash-tts-preview';
+    if (_ls('tts.apiKey')) _el('savedIndicator').style.display = 'inline';
   }
   function save() {
-    const url = _el('proxyUrl').value.trim();
     const key = _el('apiKey').value.trim();
-    if (!url || !key) { alert('Worker URL과 API Key를 모두 입력해주세요.'); return; }
-    localStorage.setItem('tts.proxyUrl', url);
+    if (!key) { alert('API Key를 입력해주세요.'); return; }
     localStorage.setItem('tts.apiKey', key);
     saveAll();
     _el('savedIndicator').style.display = 'inline';
@@ -445,8 +439,8 @@ const Settings = (() => {
   }
   function clear() {
     if (!confirm('설정을 초기화할까요?')) return;
-    ['tts.proxyUrl','tts.apiKey','tts.model'].forEach(k => localStorage.removeItem(k));
-    _el('proxyUrl').value = ''; _el('apiKey').value = '';
+    ['tts.apiKey','tts.model'].forEach(k => localStorage.removeItem(k));
+    _el('apiKey').value = '';
     _el('globalModel').value = 'gemini-3.1-flash-tts-preview';
     _el('savedIndicator').style.display = 'none';
   }
@@ -623,10 +617,10 @@ const App = (() => {
 // ─────────────────────────────────────────────────────────────────────────────
 const TTS = (() => {
   async function convertClip(project, clip) {
-    const proxyUrl = (Settings.get('tts.proxyUrl') || '').replace(/\/$/, '');
+    const proxyUrl = WORKER_URL;
     const apiKey   = Settings.get('tts.apiKey');
     const model    = Settings.get('tts.model') || 'gemini-3.1-flash-tts-preview';
-    if (!proxyUrl || !apiKey) throw new Error('설정(Worker URL/API Key)이 없습니다. #setup을 확인해주세요.');
+    if (!apiKey) throw new Error('API Key가 없습니다. #setup을 확인해주세요.');
 
     const voice = project.narrator?.voice || 'Charon';
     const tone  = clip.toneOverride || project.narrator?.baseTone || '';
@@ -918,8 +912,8 @@ const NarratorView = (() => {
 
   async function test() {
     const proj = App.currentProject(); if (!proj) return;
-    if (!Settings.get('tts.proxyUrl') || !Settings.get('tts.apiKey')) {
-      alert('설정 화면에서 Worker URL과 API Key를 먼저 저장해주세요.'); return;
+    if (!Settings.get('tts.apiKey')) {
+      alert('설정 화면에서 API Key를 먼저 저장해주세요.'); return;
     }
     save();
     const btn = document.getElementById('narratorTestBtn');
