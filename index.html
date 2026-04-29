@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TTS 클립 작업대</title>
+<style>
+  /* ===== Design Tokens ===== */
+  :root {
+    --bg-page: #f7f6f2;
+    --bg-card: #ffffff;
+    --bg-soft: #f1efe8;
+    --bg-info-soft: #e6f1fb;
+    --bg-success-soft: #e1f5ee;
+    --bg-warning-soft: #faeeda;
+    --bg-error-soft: #fbe9e7;
+    --bg-purple-soft: #eeedfe;
+    --text-primary: #1a1a1a;
+    --text-secondary: #5f5e5a;
+    --text-tertiary: #888780;
+    --text-info: #0c447c;
+    --text-success: #085041;
+    --text-warning: #854f0b;
+    --text-error: #99201d;
+    --text-purple: #3c3489;
+    --border: rgba(0, 0, 0, 0.08);
+    --border-strong: rgba(0, 0, 0, 0.16);
+    --accent: #185fa5;
+    --accent-hover: #0c447c;
+    --success: #1d9e75;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", "Noto Sans KR", "Noto Sans JP", Arial, sans-serif;
+    --font-mono: "SF Mono", Monaco, Consolas, "Courier New", monospace;
+  }
+
+  /* ===== Reset ===== */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background: var(--bg-page);
+    min-height: 100vh;
+  }
+
+  /* ===== App Shell ===== */
+  .app-header {
+    background: var(--bg-card);
+    border-bottom: 0.5px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .app-brand { flex-shrink: 0; padding: 10px 0; }
+  .app-title { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: -0.2px; }
+  .app-tagline { font-size: 11px; color: var(--text-tertiary); display: block; margin-top: 1px; }
+  .app-main { max-width: 820px; margin: 0 auto; padding: 24px; }
+
+  /* ===== Step Nav ===== */
+  .step-nav {
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    padding: 8px 0;
+    flex: 1;
+  }
+  .step-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+    color: var(--text-tertiary);
+    font-size: 12px;
+    padding: 5px 9px;
+    border-radius: var(--radius-md);
+    white-space: nowrap;
+    transition: color 0.12s, background 0.12s;
+  }
+  .step-nav-item:hover { background: var(--bg-soft); color: var(--text-secondary); }
+  .step-nav-item.active { color: var(--accent); font-weight: 500; }
+  .step-nav-item.active .step-num { background: var(--accent); color: white; }
+  .step-nav-item.step-soon { opacity: 0.45; pointer-events: none; }
+  .step-num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--border-strong);
+    color: var(--text-tertiary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+    transition: background 0.12s, color 0.12s;
+  }
+  .step-connector {
+    width: 18px; height: 1px;
+    background: var(--border-strong);
+    flex-shrink: 0;
+    margin: 0 2px;
+  }
+
+  /* ===== View System ===== */
+  .view { display: none; }
+  .view.view-active { display: block; }
+
+  /* ===== Coming Soon ===== */
+  .coming-soon-card {
+    background: var(--bg-card);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 56px 24px;
+    text-align: center;
+    color: var(--text-secondary);
+    margin-top: 8px;
+  }
+  .coming-soon-icon {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--bg-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+  }
+  .coming-soon-card h2 { font-size: 17px; font-weight: 500; margin: 0 0 8px; color: var(--text-primary); }
+  .coming-soon-card p { margin: 0 0 6px; font-size: 13px; }
+
+  /* ===== Cards ===== */
+  .card {
+    background: var(--bg-card);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  .card h2 { font-size: 15px; font-weight: 500; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+  .card h2 .num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500; flex-shrink: 0;
+  }
+  .card-sub { font-size: 12px; color: var(--text-secondary); margin: 0 0 12px; }
+
+  /* ===== Form Elements ===== */
+  .field { margin-bottom: 12px; }
+  .field-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; display: block; font-weight: 500; }
+  .input, .select, .textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 0.5px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    font-size: 13px;
+    color: var(--text-primary);
+    font-family: inherit;
+  }
+  .input:focus, .select:focus, .textarea:focus { outline: none; border-color: var(--accent); }
+  .textarea { font-size: 13px; line-height: 1.7; resize: vertical; min-height: 80px; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* ===== Buttons ===== */
+  .btn {
+    padding: 8px 16px;
+    border: 0.5px solid var(--border-strong);
+    background: transparent;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-family: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+  }
+  .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn-ghost { border-color: transparent; }
+  .btn-ghost:hover { background: var(--bg-soft); }
+
+  /* ===== Status / Spinner ===== */
+  .status {
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    margin: 12px 0;
+    display: none;
+    line-height: 1.5;
+  }
+  .status.show { display: block; }
+  .status.info { background: var(--bg-info-soft); color: var(--text-info); }
+  .status.success { background: var(--bg-success-soft); color: var(--text-success); }
+  .status.error { background: var(--bg-error-soft); color: var(--text-error); }
+  .status.warning { background: var(--bg-warning-soft); color: var(--text-warning); }
+  .spinner {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: -2px; margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== Misc ===== */
+  audio { width: 100%; margin-top: 10px; }
+  .small { font-size: 12px; color: var(--text-tertiary); }
+  .small a { color: var(--accent); }
+  details { margin-top: 8px; }
+  details summary { cursor: pointer; font-size: 12px; color: var(--text-secondary); }
+  pre {
+    background: var(--bg-soft);
+    padding: 8px;
+    border-radius: var(--radius-md);
+    font-size: 11px;
+    overflow-x: auto;
+    margin: 8px 0 0;
+    font-family: var(--font-mono);
+    line-height: 1.5;
+    max-height: 320px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  hr { border: none; border-top: 0.5px solid var(--border); margin: 14px 0; }
+
+  /* ===== Tokenizer Status ===== */
+  .tokenizer-status {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: var(--radius-md);
+    margin-bottom: 12px;
+  }
+  .tokenizer-status.loading { background: var(--bg-info-soft); color: var(--text-info); }
+  .tokenizer-status.ready { background: var(--bg-success-soft); color: var(--text-success); }
+  .tokenizer-status.error { background: var(--bg-error-soft); color: var(--text-error); }
+
+  /* ===== Kanji List ===== */
+  .kanji-list {
+    display: flex; flex-direction: column; gap: 6px;
+    max-height: 360px; overflow-y: auto;
+    padding-right: 4px;
+  }
+  .kanji-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 90px 30px;
+    gap: 10px; align-items: center;
+    padding: 8px 10px;
+    background: var(--bg-card);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+  .kanji-row.from-dict { background: linear-gradient(to right, var(--bg-purple-soft) 0%, var(--bg-card) 30%); }
+  .kanji-row.user-edited { border-color: var(--accent); }
+  .kanji-surface { font-size: 16px; font-weight: 500; }
+  .kanji-row .input { padding: 5px 8px; font-size: 13px; }
+  .kanji-source { font-size: 11px; color: var(--text-tertiary); text-align: center; }
+  .kanji-source.dict { color: var(--text-purple); font-weight: 500; }
+  .kanji-source.kuromoji { color: var(--text-secondary); }
+  .kanji-source.unknown { color: var(--text-warning); }
+  .kanji-source.edited { color: var(--accent); font-weight: 500; }
+  .kanji-list-empty {
+    padding: 20px; text-align: center;
+    font-size: 13px; color: var(--text-tertiary);
+    background: var(--bg-soft); border-radius: var(--radius-md);
+  }
+  .icon-btn-x {
+    width: 24px; height: 24px; border-radius: 4px;
+    border: none; background: transparent;
+    color: var(--text-tertiary); cursor: pointer;
+    font-size: 16px; line-height: 1;
+  }
+  .icon-btn-x:hover { background: var(--bg-soft); color: var(--text-error); }
+
+  /* ===== Summary Bar ===== */
+  .summary-bar {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    padding: 10px 14px;
+    background: var(--bg-soft);
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+  .summary-item { color: var(--text-secondary); }
+  .summary-item strong { color: var(--text-primary); font-weight: 500; }
+
+  /* ===== TTS Preview ===== */
+  .tts-preview {
+    background: var(--bg-soft);
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    line-height: 1.7;
+    margin-top: 10px;
+  }
+  .tts-preview .label {
+    font-size: 11px; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.4px;
+    margin-bottom: 4px;
+  }
+
+  /* ===== Clip Override Section ===== */
+  .clip-override-section {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: var(--bg-purple-soft);
+    border-radius: var(--radius-md);
+    border: 0.5px solid rgba(60, 52, 137, 0.2);
+  }
+  .clip-override-section .label {
+    font-size: 11px; color: var(--text-purple);
+    font-weight: 500; margin-bottom: 6px;
+  }
+  .clip-override-section .small { color: var(--text-purple); opacity: 0.75; }
+
+  /* ===== User Dictionary ===== */
+  .user-dict-empty {
+    font-size: 12px; color: var(--text-tertiary);
+    padding: 10px; text-align: center;
+    background: var(--bg-soft); border-radius: var(--radius-md);
+  }
+  .dict-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 6px;
+    max-height: 200px; overflow-y: auto;
+  }
+  .dict-pill {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 5px 10px;
+    background: var(--bg-purple-soft);
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    color: var(--text-purple);
+  }
+  .dict-pill .reading { color: var(--text-secondary); margin-left: 6px; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ===== Header ===== -->
+  <header class="app-header">
+    <div class="app-brand">
+      <div class="app-title">TTS 클립 작업대</div>
+      <span class="app-tagline">일본어 드라마 클립 음성 제작</span>
+    </div>
+    <nav class="step-nav" role="navigation" aria-label="단계 네비게이션">
+      <a href="#setup" class="step-nav-item" data-step="setup">
+        <span class="step-num">1</span><span>설정</span>
+      </a>
+      <div class="step-connector" aria-hidden="true"></div>
+      <a href="#script" class="step-nav-item" data-step="script">
+        <span class="step-num">2</span><span>대본 &amp; 변환</span>
+      </a>
+      <div class="step-connector" aria-hidden="true"></div>
+      <a href="#speakers" class="step-nav-item step-soon" data-step="speakers" tabindex="-1" aria-disabled="true">
+        <span class="step-num">3</span><span>화자 설정</span>
+      </a>
+      <div class="step-connector" aria-hidden="true"></div>
+      <a href="#workbench" class="step-nav-item step-soon" data-step="workbench" tabindex="-1" aria-disabled="true">
+        <span class="step-num">4</span><span>작업대</span>
+      </a>
+    </nav>
+  </header>
+
+  <!-- ===== Main ===== -->
+  <main class="app-main">
+
+    <!-- =========================================================
+         View: Setup (#setup)
+    ========================================================= -->
+    <section id="view-setup" class="view">
+
+      <div class="card">
+        <h2><span class="num">1</span>설정</h2>
+        <p class="card-sub">Cloudflare Worker URL과 Gemini API Key를 입력합니다. 브라우저 localStorage에만 저장됩니다.</p>
+
+        <div class="field">
+          <label class="field-label" for="proxyUrl">Cloudflare Worker URL</label>
+          <input class="input" id="proxyUrl" type="url"
+            placeholder="https://tts-proxy.dadamandes.workers.dev" />
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="apiKey">Gemini API Key</label>
+          <input class="input" id="apiKey" type="password" placeholder="AIza..." autocomplete="off" />
+          <div class="small" style="margin-top: 4px;">
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>에서 발급. 브라우저 밖으로 전송되지 않습니다.
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="Settings.save()">저장</button>
+          <button class="btn" onclick="Settings.clear()">초기화</button>
+          <span id="savedIndicator" style="display: none; font-size: 12px; color: var(--text-success);">✓ 저장됨</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
+        <a href="#script" class="btn btn-primary">다음: 대본 &amp; 변환 →</a>
+      </div>
+
+    </section>
+
+    <!-- =========================================================
+         View: Script & Conversion (#script)
+    ========================================================= -->
+    <section id="view-script" class="view">
+
+      <!-- Kuromoji tokenizer status -->
+      <div id="tokenizerStatus" class="tokenizer-status loading">
+        <span class="spinner"></span>kuromoji.js 사전 로드 중… (첫 로드 시 약 4 MB, 이후 캐시됨)
+      </div>
+
+      <!-- Script + Kanji Analysis -->
+      <div class="card">
+        <h2><span class="num">2</span>대본 + 한자 읽기</h2>
+        <p class="card-sub">대본을 입력하고 분석 버튼을 누르면 한자가 자동으로 추출됩니다. 잘못된 발음만 수정하세요.</p>
+
+        <div class="field">
+          <label class="field-label" for="text">대본 텍스트</label>
+          <textarea class="textarea" id="text" rows="3">約束の場所で待ってる。雨が降っても、僕は行くよ。</textarea>
+        </div>
+
+        <div class="btn-row" style="margin-bottom: 12px;">
+          <button class="btn btn-primary" id="analyzeBtn" onclick="KanjiAnalysis.analyze()">한자 분석</button>
+        </div>
+
+        <div id="kanjiSection" style="display: none;">
+          <div class="summary-bar">
+            <div class="summary-item">한자 단어 <strong id="totalKanjiCount">0</strong>개</div>
+            <div class="summary-item">사전 자동 적용 <strong id="dictCount">0</strong>개</div>
+            <div class="summary-item">kuromoji 추정 <strong id="kuromojiCount">0</strong>개</div>
+            <div class="summary-item">미인식 <strong id="unknownCount">0</strong>개</div>
+          </div>
+
+          <div class="kanji-list" id="kanjiList"></div>
+
+          <hr />
+
+          <div class="tts-preview">
+            <div class="label">TTS에 전달될 가나 변환 결과</div>
+            <div id="ttsPreview" style="font-family: var(--font-mono);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Voice Conversion -->
+      <div class="card" id="conversionCard" style="display: none;">
+        <h2><span class="num">3</span>음성 변환</h2>
+
+        <div class="row-2">
+          <div class="field">
+            <label class="field-label" for="voice">목소리</label>
+            <select class="select" id="voice" onchange="Settings.saveVoicePrefs()">
+              <option value="Aoede">Aoede (밝음)</option>
+              <option value="Charon" selected>Charon (정보적)</option>
+              <option value="Fenrir">Fenrir (흥분된)</option>
+              <option value="Kore">Kore (확고함)</option>
+              <option value="Leda">Leda (젊음)</option>
+              <option value="Orus">Orus (단호함)</option>
+              <option value="Puck">Puck (활발함)</option>
+              <option value="Zephyr">Zephyr (밝음)</option>
+              <option value="Algieba">Algieba (부드러움)</option>
+              <option value="Callirrhoe">Callirrhoe (편안함)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="model">모델</label>
+            <select class="select" id="model" onchange="Settings.saveVoicePrefs()">
+              <option value="gemini-2.5-flash-preview-tts" selected>Gemini 2.5 Flash TTS (Preview)</option>
+              <option value="gemini-2.5-pro-preview-tts">Gemini 2.5 Pro TTS (Preview)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="tone">톤 지시 <span class="small">(선택, 자연어)</span></label>
+          <input class="input" id="tone" placeholder="예: 차분하고 부드러운 청년의 목소리로"
+            onchange="Settings.saveVoicePrefs()" />
+        </div>
+
+        <!-- Phase 2에서는 클립 카드마다 이 섹션이 분리됩니다 -->
+        <div class="clip-override-section">
+          <div class="label">이 클립만의 한자 읽기 오버라이드</div>
+          <div class="small">
+            같은 한자를 다른 클립에서는 정상으로 두고, 이 클립에서만 다르게 읽고 싶을 때 위 한자 목록의 가나를 직접 수정하세요.
+            Phase 2 (작업대)에서는 클립 카드마다 이 영역이 분리됩니다.
+          </div>
+        </div>
+
+        <div class="btn-row" style="margin-top: 12px;">
+          <button class="btn btn-primary" id="convertBtn" onclick="TTS.convert()">음성 변환</button>
+          <span class="small">예상 비용 약 $0.001 미만</span>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div id="result" style="display: none;">
+          <audio id="audioPlayer" controls></audio>
+          <div class="btn-row" style="margin-top: 10px;">
+            <button class="btn" onclick="TTS.downloadAudio()">.wav 다운로드</button>
+          </div>
+          <details>
+            <summary>요청/응답 디버그 정보</summary>
+            <pre id="debugInfo"></pre>
+          </details>
+        </div>
+      </div>
+
+      <!-- User Dictionary -->
+      <div class="card">
+        <h2><span class="num">4</span>사용자 사전 <span class="small" style="font-weight: 400;">(localStorage 누적)</span></h2>
+        <p class="card-sub">한 번 입력한 가나는 자동으로 여기에 저장되어 다음 세션에서도 자동 채워집니다.</p>
+
+        <div id="userDictSection">
+          <div class="user-dict-empty" id="userDictEmpty">아직 저장된 항목이 없습니다.</div>
+          <div class="dict-grid" id="userDictList" style="display: none;"></div>
+        </div>
+
+        <div class="btn-row" style="margin-top: 10px;">
+          <button class="btn btn-sm" onclick="UserDict.export()">JSON 내보내기</button>
+          <button class="btn btn-sm" onclick="UserDict.import()">JSON 가져오기</button>
+          <button class="btn btn-sm btn-ghost" onclick="UserDict.clear()"
+            style="color: var(--text-error); margin-left: auto;">전체 삭제</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =========================================================
+         View: Speakers (#speakers) — Phase 2
+    ========================================================= -->
+    <section id="view-speakers" class="view">
+      <div class="coming-soon-card">
+        <div class="coming-soon-icon">3</div>
+        <h2>화자 설정</h2>
+        <p>Phase 2에서 추가됩니다.</p>
+        <p class="small">캐릭터별 목소리, 모델, 톤 지시를 프리셋으로 저장하고 클립마다 빠르게 적용합니다.</p>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         View: Workbench (#workbench) — Phase 2
+    ========================================================= -->
+    <section id="view-workbench" class="view">
+      <div class="coming-soon-card">
+        <div class="coming-soon-icon">4</div>
+        <h2>작업대</h2>
+        <p>Phase 2에서 추가됩니다.</p>
+        <p class="small">32개(혹은 임의 개수) 클립을 한 화면에서 관리하며 일괄 변환, 재생, 다운로드합니다.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- kuromoji.js from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js"></script>
+
+<script>
+'use strict';
+
+// ============================================================
+// MODULE: Utils
+// ============================================================
+const Utils = (() => {
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function escapeJs(str) {
+    return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  }
+  return { escapeHtml, escapeJs };
+})();
+
+// ============================================================
+// MODULE: Settings
+// Manages localStorage keys: tts.proxyUrl, tts.apiKey,
+//   tts.voice, tts.model, tts.tone
+// ============================================================
+const Settings = (() => {
+  function load() {
+    _el('proxyUrl').value = _get('tts.proxyUrl') || '';
+    _el('apiKey').value   = _get('tts.apiKey')   || '';
+    if (_get('tts.proxyUrl') && _get('tts.apiKey')) {
+      _el('savedIndicator').style.display = 'inline';
+    }
+    const voice = _get('tts.voice');
+    const model = _get('tts.model');
+    const tone  = _get('tts.tone');
+    if (voice) _el('voice').value = voice;
+    if (model) _el('model').value = model;
+    if (tone)  _el('tone').value  = tone;
+  }
+
+  function save() {
+    const proxyUrl = _el('proxyUrl').value.trim();
+    const apiKey   = _el('apiKey').value.trim();
+    if (!proxyUrl || !apiKey) {
+      alert('Worker URL과 API Key를 모두 입력해주세요.');
+      return;
+    }
+    localStorage.setItem('tts.proxyUrl', proxyUrl);
+    localStorage.setItem('tts.apiKey', apiKey);
+    _el('savedIndicator').style.display = 'inline';
+  }
+
+  function clear() {
+    if (!confirm('설정을 초기화할까요?')) return;
+    ['tts.proxyUrl', 'tts.apiKey'].forEach(k => localStorage.removeItem(k));
+    _el('proxyUrl').value = '';
+    _el('apiKey').value   = '';
+    _el('savedIndicator').style.display = 'none';
+  }
+
+  function saveVoicePrefs() {
+    localStorage.setItem('tts.voice', _el('voice').value);
+    localStorage.setItem('tts.model', _el('model').value);
+    localStorage.setItem('tts.tone',  _el('tone').value.trim());
+  }
+
+  function get(key) { return localStorage.getItem(key); }
+
+  function _el(id) { return document.getElementById(id); }
+  function _get(k) { return localStorage.getItem(k); }
+
+  return { load, save, clear, saveVoicePrefs, get };
+})();
+
+// ============================================================
+// MODULE: UserDict
+// Persists { surface: reading } map in localStorage.
+// Key: tts.userDict.v1
+// Phase 2: this dict will also be accessible per-clip for overrides.
+// ============================================================
+const UserDict = (() => {
+  const KEY = 'tts.userDict.v1';
+  let _dict = {};
+
+  function load() {
+    try { _dict = JSON.parse(localStorage.getItem(KEY) || '{}'); }
+    catch { _dict = {}; }
+    _render();
+  }
+
+  function set(surface, reading) {
+    if (!surface || !reading) return;
+    _dict[surface] = reading;
+    _persist();
+  }
+
+  function remove(surface) {
+    delete _dict[surface];
+    _persist();
+  }
+
+  function get(surface) { return _dict[surface] || null; }
+
+  function clear() {
+    if (!confirm('사용자 사전 전체를 삭제할까요?')) return;
+    _dict = {};
+    _persist();
+  }
+
+  function exportDict() {
+    const blob = new Blob([JSON.stringify(_dict, null, 2)], { type: 'application/json' });
+    _download(blob, `tts-user-dict-${new Date().toISOString().slice(0, 10)}.json`);
+  }
+
+  function importDict() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const data = JSON.parse(await file.text());
+        if (typeof data !== 'object' || Array.isArray(data)) throw new Error('형식 오류');
+        Object.assign(_dict, data);
+        _persist();
+        alert(`${Object.keys(data).length}개 항목을 가져왔습니다.`);
+      } catch (err) {
+        alert('가져오기 실패: ' + err.message);
+      }
+    };
+    input.click();
+  }
+
+  function _persist() {
+    localStorage.setItem(KEY, JSON.stringify(_dict));
+    _render();
+  }
+
+  function _render() {
+    const entries = Object.entries(_dict);
+    const empty = document.getElementById('userDictEmpty');
+    const list  = document.getElementById('userDictList');
+    if (entries.length === 0) {
+      empty.style.display = 'block';
+      list.style.display  = 'none';
+      return;
+    }
+    empty.style.display = 'none';
+    list.style.display  = 'grid';
+    list.innerHTML = '';
+    entries.sort(([a], [b]) => a.localeCompare(b)).forEach(([surface, reading]) => {
+      const pill = document.createElement('div');
+      pill.className = 'dict-pill';
+      pill.innerHTML = `
+        <span>
+          <strong>${Utils.escapeHtml(surface)}</strong>
+          <span class="reading">${Utils.escapeHtml(reading)}</span>
+        </span>
+        <button class="icon-btn-x" title="삭제"
+          onclick="UserDict.remove('${Utils.escapeJs(surface)}')">×</button>
+      `;
+      list.appendChild(pill);
+    });
+  }
+
+  function _download(blob, filename) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  return { load, set, remove, get, clear, export: exportDict, import: importDict };
+})();
+
+// ============================================================
+// MODULE: Tokenizer
+// Wraps kuromoji.js initialization and tokenization.
+// ============================================================
+const Tokenizer = (() => {
+  const DICT_CDN = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/';
+  let _tokenizer = null;
+
+  async function init() {
+    const statusEl = document.getElementById('tokenizerStatus');
+    try {
+      const t0 = performance.now();
+      _tokenizer = await new Promise((resolve, reject) => {
+        if (typeof kuromoji === 'undefined') {
+          reject(new Error('kuromoji 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인해주세요.'));
+          return;
+        }
+        kuromoji.builder({ dicPath: DICT_CDN }).build((err, t) =>
+          err ? reject(err) : resolve(t)
+        );
+      });
+      const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
+      statusEl.className = 'tokenizer-status ready';
+      statusEl.textContent = `✓ kuromoji 준비 완료 (${elapsed}초)`;
+      setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
+    } catch (err) {
+      statusEl.className = 'tokenizer-status error';
+      statusEl.textContent = `❌ kuromoji 로드 실패: ${err.message}`;
+    }
+  }
+
+  function tokenize(text) {
+    return _tokenizer ? _tokenizer.tokenize(text) : null;
+  }
+
+  function isReady() { return !!_tokenizer; }
+
+  return { init, tokenize, isReady };
+})();
+
+// ============================================================
+// MODULE: KanjiAnalysis
+// Analyzes text, manages kanji entries for the current clip.
+// Phase 2: entries will move into a per-clip data structure.
+// ============================================================
+const KanjiAnalysis = (() => {
+  // State for the current single clip (Phase 2: this becomes part of a Clip object)
+  const _state = {
+    entries: [],        // [{ surface, reading, source: 'dict'|'kuromoji'|'unknown'|'edited' }]
+    lastAudioBlob: null,
+  };
+
+  const _SOURCE_LABELS = {
+    dict:     ['★ 사전',  'dict'],
+    kuromoji: ['추정',    'kuromoji'],
+    unknown:  ['미인식',  'unknown'],
+    edited:   ['편집됨',  'edited'],
+  };
+
+  function analyze() {
+    if (!Tokenizer.isReady()) {
+      alert('kuromoji가 아직 준비되지 않았습니다. 잠시만 기다려주세요.');
+      return;
+    }
+    const text = document.getElementById('text').value.trim();
+    if (!text) { alert('대본을 입력해주세요.'); return; }
+
+    const tokens = Tokenizer.tokenize(text);
+    const seen = new Set();
+    _state.entries = tokens
+      .filter(t => _containsKanji(t.surface_form) && !seen.has(t.surface_form) && seen.add(t.surface_form))
+      .map(t => {
+        const surface = t.surface_form;
+        const dictReading = UserDict.get(surface);
+        if (dictReading) return { surface, reading: dictReading, source: 'dict' };
+        if (t.reading && t.reading !== '*') {
+          return { surface, reading: _kata2hira(t.reading), source: 'kuromoji' };
+        }
+        return { surface, reading: '', source: 'unknown' };
+      });
+
+    _render();
+    updatePreview();
+    document.getElementById('kanjiSection').style.display  = 'block';
+    document.getElementById('conversionCard').style.display = 'block';
+  }
+
+  function updateReading(idx, value) {
+    const entry = _state.entries[idx];
+    if (!entry) return;
+    entry.reading = value.trim();
+    if (entry.reading) {
+      entry.source = 'edited';
+      UserDict.set(entry.surface, entry.reading);
+    }
+    const row = document.querySelectorAll('.kanji-row')[idx];
+    if (row) {
+      row.classList.remove('from-dict');
+      row.classList.add('user-edited');
+      const labelEl = row.querySelector('.kanji-source');
+      labelEl.className = 'kanji-source edited';
+      labelEl.textContent = '편집됨';
+    }
+    _updateSummary();
+    updatePreview();
+  }
+
+  function removeEntry(idx) {
+    _state.entries.splice(idx, 1);
+    _render();
+    updatePreview();
+  }
+
+  // Replaces kanji in text with their mapped readings.
+  // Exported so TTS module can use it, and for the text input live-preview.
+  function applyReadings(text, entries) {
+    let result = text;
+    const sorted = [...entries].filter(e => e.reading).sort((a, b) => b.surface.length - a.surface.length);
+    for (const { surface, reading } of sorted) {
+      const esc = surface.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      result = result.replace(new RegExp(esc, 'g'), reading);
+    }
+    return result;
+  }
+
+  function updatePreview() {
+    const text = document.getElementById('text').value.trim();
+    const converted = applyReadings(text, _state.entries);
+    const previewEl = document.getElementById('ttsPreview');
+
+    let html = Utils.escapeHtml(converted).replace(
+      /[\u4E00-\u9FFF\u3400-\u4DBF]+/g,
+      m => `<span style="background:var(--bg-error-soft);color:var(--text-error);padding:1px 3px;border-radius:3px;">${Utils.escapeHtml(m)}</span>`
+    );
+    previewEl.innerHTML = html;
+
+    const remaining = (converted.match(/[\u4E00-\u9FFF\u3400-\u4DBF]/g) || []).length;
+    if (remaining > 0) {
+      previewEl.innerHTML += `<div style="margin-top:6px;font-size:11px;color:var(--text-warning);">⚠ ${remaining}개의 한자가 가나로 변환되지 않았습니다.</div>`;
+    }
+  }
+
+  function getEntries()             { return _state.entries; }
+  function setLastAudioBlob(blob)   { _state.lastAudioBlob = blob; }
+  function getLastAudioBlob()       { return _state.lastAudioBlob; }
+
+  // ---- private ----
+
+  function _render() {
+    const list = document.getElementById('kanjiList');
+    list.innerHTML = '';
+    if (_state.entries.length === 0) {
+      list.innerHTML = '<div class="kanji-list-empty">한자가 감지되지 않았습니다.</div>';
+      _updateSummary();
+      return;
+    }
+    _state.entries.forEach((entry, idx) => {
+      const [label, cls] = _SOURCE_LABELS[entry.source] || ['', ''];
+      const row = document.createElement('div');
+      row.className = 'kanji-row'
+        + (entry.source === 'dict'   ? ' from-dict'   : '')
+        + (entry.source === 'edited' ? ' user-edited' : '');
+      row.innerHTML = `
+        <div class="kanji-surface">${Utils.escapeHtml(entry.surface)}</div>
+        <input class="input" type="text" value="${Utils.escapeHtml(entry.reading)}"
+          placeholder="가나로 입력 (예: やくそく)"
+          oninput="KanjiAnalysis.updateReading(${idx}, this.value)" />
+        <div class="kanji-source ${cls}">${label}</div>
+        <button class="icon-btn-x" title="이 항목 제외"
+          onclick="KanjiAnalysis.removeEntry(${idx})">×</button>
+      `;
+      list.appendChild(row);
+    });
+    _updateSummary();
+  }
+
+  function _updateSummary() {
+    const e = _state.entries;
+    document.getElementById('totalKanjiCount').textContent = e.length;
+    document.getElementById('dictCount').textContent       = e.filter(x => x.source === 'dict').length;
+    document.getElementById('kuromojiCount').textContent   = e.filter(x => x.source === 'kuromoji').length;
+    document.getElementById('unknownCount').textContent    = e.filter(x => x.source === 'unknown').length;
+  }
+
+  function _kata2hira(s) {
+    return String(s || '').replace(/[\u30A1-\u30F6]/g, c =>
+      String.fromCharCode(c.charCodeAt(0) - 0x60)
+    );
+  }
+
+  function _containsKanji(s) {
+    return /[\u4E00-\u9FFF\u3400-\u4DBF]/.test(s);
+  }
+
+  return { analyze, updateReading, removeEntry, applyReadings, updatePreview, getEntries, setLastAudioBlob, getLastAudioBlob };
+})();
+
+// ============================================================
+// MODULE: AudioUtils
+// Pure functions for PCM → WAV conversion.
+// ============================================================
+const AudioUtils = (() => {
+  function parsePcmRate(mimeType) {
+    const m = String(mimeType).match(/rate=(\d+)/);
+    return m ? parseInt(m[1], 10) : null;
+  }
+
+  function base64ToBytes(b64) {
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+
+  function pcmToWav(pcmBytes, sampleRate, channels, bitsPerSample) {
+    const byteRate   = sampleRate * channels * bitsPerSample / 8;
+    const blockAlign = channels * bitsPerSample / 8;
+    const dataSize   = pcmBytes.length;
+    const buf  = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(buf);
+    _str(view,  0, 'RIFF');
+    view.setUint32( 4, 36 + dataSize, true);
+    _str(view,  8, 'WAVE');
+    _str(view, 12, 'fmt ');
+    view.setUint32(16, 16,           true);
+    view.setUint16(20, 1,            true);   // PCM
+    view.setUint16(22, channels,     true);
+    view.setUint32(24, sampleRate,   true);
+    view.setUint32(28, byteRate,     true);
+    view.setUint16(32, blockAlign,   true);
+    view.setUint16(34, bitsPerSample,true);
+    _str(view, 36, 'data');
+    view.setUint32(40, dataSize,     true);
+    new Uint8Array(buf, 44).set(pcmBytes);
+    return new Blob([buf], { type: 'audio/wav' });
+  }
+
+  function _str(view, offset, str) {
+    for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+  }
+
+  return { parsePcmRate, base64ToBytes, pcmToWav };
+})();
+
+// ============================================================
+// MODULE: TTS
+// Calls the Cloudflare Worker proxy → Gemini TTS API.
+// ============================================================
+const TTS = (() => {
+  function _showStatus(msg, type = 'info') {
+    const el = document.getElementById('status');
+    el.className = 'status show ' + type;
+    el.innerHTML = type === 'info' ? `<span class="spinner"></span>${msg}` : msg;
+  }
+
+  function _showDebug(lines) {
+    document.getElementById('debugInfo').textContent = lines.join('\n');
+    document.getElementById('result').style.display = 'block';
+  }
+
+  async function convert() {
+    const proxyUrl = (Settings.get('tts.proxyUrl') || '').replace(/\/$/, '');
+    const apiKey   = Settings.get('tts.apiKey');
+    const text     = document.getElementById('text').value.trim();
+    const voice    = document.getElementById('voice').value;
+    const model    = document.getElementById('model').value;
+    const tone     = document.getElementById('tone').value.trim();
+
+    if (!proxyUrl || !apiKey) {
+      _showStatus('먼저 설정 화면에서 Worker URL과 API Key를 저장해주세요.', 'error');
+      return;
+    }
+    if (!text) { _showStatus('대본 텍스트를 입력해주세요.', 'error'); return; }
+
+    const ttsText    = KanjiAnalysis.applyReadings(text, KanjiAnalysis.getEntries());
+    const promptText = tone ? `${tone}: ${ttsText}` : ttsText;
+
+    const btn = document.getElementById('convertBtn');
+    btn.disabled = true;
+    document.getElementById('result').style.display = 'none';
+    _showStatus('Gemini TTS 호출 중…', 'info');
+
+    const requestBody = {
+      contents: [{ parts: [{ text: promptText }] }],
+      generationConfig: {
+        responseModalities: ['AUDIO'],
+        speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } },
+      },
+    };
+    const url = `${proxyUrl}/v1beta/models/${model}:generateContent`;
+
+    const debug = [];
+    debug.push(`원본 텍스트: ${text}`);
+    debug.push(`TTS 전송 텍스트: ${ttsText}`);
+    if (tone) debug.push(`톤 지시: ${tone}`);
+    debug.push('');
+    debug.push(`POST ${url}`);
+    debug.push(`Body: ${JSON.stringify(requestBody, null, 2)}`);
+
+    try {
+      const t0 = performance.now();
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': apiKey },
+        body: JSON.stringify(requestBody),
+      });
+      const elapsed = Math.round(performance.now() - t0);
+      const rawText = await res.text();
+      debug.push(`\nStatus: ${res.status} (${elapsed}ms)`);
+
+      if (!res.ok) {
+        debug.push(`Response: ${rawText.slice(0, 800)}`);
+        _showDebug(debug);
+        _showStatus(`API 에러 (${res.status}). 디버그 정보를 확인해주세요.`, 'error');
+        return;
+      }
+
+      let json;
+      try { json = JSON.parse(rawText); }
+      catch {
+        debug.push(`Response (raw): ${rawText.slice(0, 800)}`);
+        _showDebug(debug);
+        _showStatus('응답 JSON 파싱 실패.', 'error');
+        return;
+      }
+
+      const part        = json?.candidates?.[0]?.content?.parts?.[0];
+      const audioBase64 = part?.inlineData?.data;
+      const mimeType    = part?.inlineData?.mimeType || '';
+
+      if (!audioBase64) {
+        debug.push(`Response structure: ${JSON.stringify(json, null, 2).slice(0, 800)}`);
+        _showDebug(debug);
+        _showStatus('응답에 오디오 데이터가 없습니다.', 'error');
+        return;
+      }
+
+      const sampleRate = AudioUtils.parsePcmRate(mimeType) || 24000;
+      const pcmBytes   = AudioUtils.base64ToBytes(audioBase64);
+      const wavBlob    = AudioUtils.pcmToWav(pcmBytes, sampleRate, 1, 16);
+
+      debug.push(`Audio mimeType: ${mimeType}`);
+      debug.push(`Sample rate: ${sampleRate} Hz`);
+      debug.push(`PCM bytes: ${pcmBytes.length}`);
+      debug.push(`WAV blob: ${wavBlob.size} bytes`);
+      _showDebug(debug);
+
+      KanjiAnalysis.setLastAudioBlob(wavBlob);
+      document.getElementById('audioPlayer').src = URL.createObjectURL(wavBlob);
+      document.getElementById('result').style.display = 'block';
+      _showStatus(`변환 성공 (${elapsed}ms)`, 'success');
+
+    } catch (err) {
+      debug.push(`\nError: ${String(err)}`);
+      _showDebug(debug);
+      _showStatus(`요청 실패: ${err.message}`, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function downloadAudio() {
+    const blob = KanjiAnalysis.getLastAudioBlob();
+    if (!blob) return;
+    const a = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    a.href = url;
+    a.download = `tts-${Date.now()}.wav`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  return { convert, downloadAudio };
+})();
+
+// ============================================================
+// MODULE: Router
+// Hash-based SPA routing. Views: setup, script, speakers, workbench
+// ============================================================
+const Router = (() => {
+  const VIEWS = ['setup', 'script', 'speakers', 'workbench'];
+
+  function _currentStep() {
+    const hash = location.hash.slice(1);
+    return VIEWS.includes(hash) ? hash : 'setup';
+  }
+
+  function _show(step) {
+    VIEWS.forEach(v => {
+      const el = document.getElementById(`view-${v}`);
+      if (el) el.classList.toggle('view-active', v === step);
+    });
+    document.querySelectorAll('.step-nav-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.step === step);
+    });
+  }
+
+  function init() {
+    window.addEventListener('hashchange', () => _show(_currentStep()));
+    _show(_currentStep());
+  }
+
+  return { init };
+})();
+
+// ============================================================
+// BOOT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  Settings.load();
+  UserDict.load();
+  Tokenizer.init();
+  Router.init();
+
+  // Live TTS preview when text changes after analysis is done
+  document.getElementById('text').addEventListener('input', () => {
+    if (KanjiAnalysis.getEntries().length > 0) KanjiAnalysis.updatePreview();
+  });
+});
+</script>
+
+</body>
+</html>
