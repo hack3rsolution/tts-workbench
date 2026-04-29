@@ -756,13 +756,24 @@ const UserDict = (() => {
 // ============================================================
 // MODULE: Tokenizer
 // Wraps kuromoji.js initialization and tokenization.
+// init() is idempotent — safe to call multiple times.
+// Loaded lazily when the script view is first activated,
+// not on page boot, to avoid blocking the main thread.
 // ============================================================
 const Tokenizer = (() => {
   const DICT_CDN = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/';
   let _tokenizer = null;
+  let _initStarted = false;
 
-  async function init() {
+  function init() {
+    if (_initStarted) return; // already loading or done
+    _initStarted = true;
+    _load();
+  }
+
+  async function _load() {
     const statusEl = document.getElementById('tokenizerStatus');
+    statusEl.style.display = 'flex'; // make visible in case view was hidden
     try {
       const t0 = performance.now();
       _tokenizer = await new Promise((resolve, reject) => {
@@ -779,6 +790,7 @@ const Tokenizer = (() => {
       statusEl.textContent = `✓ kuromoji 준비 완료 (${elapsed}초)`;
       setTimeout(() => { statusEl.style.display = 'none'; }, 2000);
     } catch (err) {
+      _initStarted = false; // allow retry on error
       statusEl.className = 'tokenizer-status error';
       statusEl.textContent = `❌ kuromoji 로드 실패: ${err.message}`;
     }
@@ -1150,6 +1162,8 @@ const Router = (() => {
     document.querySelectorAll('.step-nav-item').forEach(el => {
       el.classList.toggle('active', el.dataset.step === step);
     });
+    // Lazy-load tokenizer the first time the script view is shown
+    if (step === 'script') Tokenizer.init();
   }
 
   function init() {
@@ -1161,18 +1175,18 @@ const Router = (() => {
 })();
 
 // ============================================================
-// BOOT
+// BOOT — direct calls like step1b (scripts are at bottom of
+// body, so DOM is fully parsed when this runs).
+// Tokenizer is NOT started here — it lazy-loads when the
+// script view is first shown (Router._show handles it).
 // ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-  Settings.load();
-  UserDict.load();
-  Tokenizer.init();
-  Router.init();
+Settings.load();
+UserDict.load();
+Router.init();
 
-  // Live TTS preview when text changes after analysis is done
-  document.getElementById('text').addEventListener('input', () => {
-    if (KanjiAnalysis.getEntries().length > 0) KanjiAnalysis.updatePreview();
-  });
+// Live TTS preview when text changes after analysis is done
+document.getElementById('text').addEventListener('input', () => {
+  if (KanjiAnalysis.getEntries().length > 0) KanjiAnalysis.updatePreview();
 });
 </script>
 
