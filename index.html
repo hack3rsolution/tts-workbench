@@ -213,7 +213,7 @@
     <section id="view-script" class="view">
       <div class="card">
         <h2><span class="num">2</span>대본 입력</h2>
-        <p class="card-sub"><code>1-1</code>, <code>1-2</code> 같은 마커로 단락을 구분합니다. 단락 한 개 = 클립 한 개.</p>
+        <p class="card-sub"><code>【チャプター1】</code> → 챕터, <code>&lt;1-1&gt;</code> → 단락. 단락 한 개 = 클립 한 개.</p>
         <div class="field">
           <label class="field-label" for="projectName">프로젝트 이름</label>
           <input class="input" id="projectName" placeholder="상점가" oninput="ScriptView.onNameChange(this.value)" />
@@ -222,16 +222,23 @@
           <div>
             <label class="field-label">대본 텍스트</label>
             <textarea class="textarea" id="scriptText" rows="14"
-              placeholder="1-1&#10;&#10;나레이션 한 문장.&#10;나레이션 또 한 문장.&#10;「인물 대사」&#10;나레이션 마무리.&#10;&#10;1-2&#10;&#10;다음 단락의 나레이션..."
+              placeholder="【イントロ】&#10;&#10;인트로 본문...&#10;&#10;【チャプター1】&#10;<1-1>&#10;나레이션 한 문장.&#10;「인물 대사」&#10;<1-2>&#10;다음 단락...&#10;&#10;【チャプター2】&#10;<2-1>&#10;..."
               oninput="ScriptView.onTextChange()"></textarea>
           </div>
           <div>
-            <div class="field-label">단락 미리보기</div>
+            <div class="field-label">파싱 미리보기</div>
             <div id="scriptStatsBar" class="script-stats-bar"></div>
             <div class="script-preview-list" id="scriptPreview">
-              <div class="preview-empty">마커(1-1, 1-2...)를 포함한 대본을 입력하면 미리보기가 표시됩니다.</div>
+              <div class="preview-empty">대본을 붙여넣으면 인트로·챕터·단락 수가 표시됩니다.</div>
             </div>
           </div>
+        </div>
+        <div style="margin-top:10px;padding:8px 10px;background:var(--bg-soft);border-radius:var(--radius-md)">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
+            <input type="checkbox" id="includeIntros" onchange="ScriptView.onIncludeIntrosChange()">
+            인트로도 변환에 포함하기
+            <span class="small">(기본: 포함 안 함 — 챕터 단락만 변환)</span>
+          </label>
         </div>
       </div>
       <div class="nav-row">
@@ -358,42 +365,65 @@ const TONE_PRESETS = ['차분하게','밝게','슬프게','강하게','부드럽
 const DEFAULT_NARRATOR_TONE = '차분하고 자연스러운 나레이터 톤으로 읽어주세요. 「」 안의 대사는 등장인물의 대사이므로 약간 다른 톤으로 읽어주세요.';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// parseScript — 대본 텍스트 → 클립 배열
-// 마커: 줄 시작에 \d+-\d+ 형식 (앞뒤 빈 줄 허용)
+// parseScript — 실제 대본 형식 파서
+//   【...】       → 챕터 마커 (チャプター\d+ 이면 정식 챕터, 그 외는 인트로)
+//   <숫자-숫자>   → 단락 마커 (클립 ID)
+//   Returns: { intros: [...], chapters: [{ chapterNumber, title, subtitle, clips: [...] }] }
 // ─────────────────────────────────────────────────────────────────────────────
 function parseScript(text) {
-  const lines = text.split('\n');
-  const segments = [];
-  let currentId = null;
-  let currentLines = [];
-  const markerRe = /^\s*(\d+)-(\d+)\s*$/;
+  const lines       = text.split('\n');
+  const intros      = [];
+  const chapters    = [];
+  let currentClip   = null;
+  let currentLines  = [];
+  let currentChapter = null;
+  let introCount    = 0;
 
-  function flush() {
-    if (currentId === null) return;
-    const bodyText = currentLines.join('\n').trim();
-    if (bodyText) {
-      const parts = currentId.split('-');
-      segments.push({
-        id: currentId,
-        chapterIndex: parseInt(parts[0], 10),
-        subIndex: parseInt(parts[1], 10),
-        text: bodyText,
-      });
+  const chapterRe = /^【(.+?)】\s*$/;
+  const clipRe    = /^<(\d+)-(\d+)>\s*$/;
+
+  function flushClip() {
+    if (!currentClip) return;
+    currentClip.text = currentLines.join('\n').trim();
+    if (currentClip.text) {
+      if (currentClip.isIntro) intros.push(currentClip);
+      else if (currentChapter) currentChapter.clips.push(currentClip);
     }
+    currentClip = null;
+    currentLines = [];
   }
 
   for (const line of lines) {
-    const m = line.match(markerRe);
-    if (m) {
-      flush();
-      currentId = `${m[1]}-${m[2]}`;
+    const cM = line.match(chapterRe);
+    const pM = line.match(clipRe);
+    if (cM) {
+      flushClip();
+      const inner = cM[1];
+      const numM  = inner.match(/チャプター(\d+)/);
+      if (numM) {
+        // full-width colon ： or ASCII colon :
+        const sepIdx = inner.includes('：') ? inner.indexOf('：') : inner.includes(':') ? inner.indexOf(':') : -1;
+        const subtitle = sepIdx >= 0 ? inner.slice(sepIdx + 1).trim() : null;
+        currentChapter = { chapterNumber: parseInt(numM[1], 10), title: inner, subtitle, clips: [] };
+        chapters.push(currentChapter);
+      } else {
+        // Intro section (イントロ or anything without チャプターN)
+        introCount++;
+        currentClip = { id: `intro-${introCount}`, chapterIndex: 0, subIndex: introCount, chapterTitle: inner, isIntro: true };
+        currentLines = [];
+      }
+    } else if (pM) {
+      flushClip();
+      const ch = parseInt(pM[1], 10), sub = parseInt(pM[2], 10);
+      currentClip = { id: `${ch}-${sub}`, chapterIndex: ch, subIndex: sub, chapterTitle: currentChapter?.title || `チャプター${ch}`, isIntro: false };
       currentLines = [];
     } else {
-      if (currentId !== null) currentLines.push(line);
+      if (currentClip) currentLines.push(line);
     }
   }
-  flush();
-  return segments;
+  flushClip();
+
+  return { intros, chapters };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -584,6 +614,7 @@ const App = (() => {
       id: crypto.randomUUID(), name, createdAt: now(), updatedAt: now(),
       narrator: { voice: 'Charon', baseTone: DEFAULT_NARRATOR_TONE },
       kanjiReadings: {},
+      includeIntros: false,
       clips: [],
     };
     await Storage.put('projects', p);
@@ -786,11 +817,39 @@ const ScriptView = (() => {
   function onEnter() {
     const proj = App.currentProject(); if (!proj) return;
     document.getElementById('projectName').value = proj.name;
+    const cb = document.getElementById('includeIntros');
+    if (cb) cb.checked = proj.includeIntros ?? false;
     if (proj.clips.length > 0) {
-      // Reconstruct script with markers
-      document.getElementById('scriptText').value = proj.clips.map(c => `${c.id}\n\n${c.text}`).join('\n\n');
+      document.getElementById('scriptText').value = _reconstructScript(proj.clips);
     }
     updatePreview();
+  }
+
+  // Rebuild textarea text from saved clips (intros + chapters)
+  function _reconstructScript(clips) {
+    if (!clips || clips.length === 0) return '';
+    const intros   = clips.filter(c => c.isIntro).sort((a,b) => a.subIndex - b.subIndex);
+    const chapters = clips.filter(c => !c.isIntro);
+
+    const parts = [];
+    for (const intro of intros) {
+      parts.push(`【${intro.chapterTitle || 'イントロ'}】\n\n${intro.text}`);
+    }
+
+    // Group by chapterIndex, keeping title from first clip of that chapter
+    const chMap = new Map();
+    for (const c of chapters) {
+      if (!chMap.has(c.chapterIndex)) chMap.set(c.chapterIndex, { title: c.chapterTitle || `チャプター${c.chapterIndex}`, clips: [] });
+      chMap.get(c.chapterIndex).clips.push(c);
+    }
+    for (const [, { title, clips: cc }] of [...chMap].sort(([a],[b]) => a - b)) {
+      const clipLines = cc
+        .sort((a,b) => a.subIndex - b.subIndex)
+        .map(c => `<${c.id}>\n${c.text}`)
+        .join('\n');
+      parts.push(`【${title}】\n${clipLines}`);
+    }
+    return parts.join('\n\n');
   }
 
   function onNameChange(val) {
@@ -802,62 +861,96 @@ const ScriptView = (() => {
 
   function onTextChange() { updatePreview(); }
 
+  function onIncludeIntrosChange() {
+    const proj = App.currentProject(); if (!proj) return;
+    proj.includeIntros = document.getElementById('includeIntros').checked;
+    App.scheduleSave();
+  }
+
   function updatePreview() {
-    const text = document.getElementById('scriptText').value;
-    const segments = parseScript(text);
+    const text     = document.getElementById('scriptText').value;
+    const parsed   = parseScript(text);
     const preview  = document.getElementById('scriptPreview');
     const statsBar = document.getElementById('scriptStatsBar');
 
-    if (segments.length === 0) {
-      if (preview) preview.innerHTML = '<div class="preview-empty">마커(1-1, 1-2...)를 포함한 대본을 입력하면 미리보기가 표시됩니다.</div>';
+    const totalClips = parsed.chapters.reduce((s, c) => s + c.clips.length, 0);
+
+    if (totalClips === 0 && parsed.intros.length === 0) {
+      if (preview)  preview.innerHTML  = '<div class="preview-empty">대본을 붙여넣으면 인트로·챕터·단락 수가 표시됩니다.</div>';
       if (statsBar) statsBar.innerHTML = '';
       return;
     }
 
-    // Chapter breakdown
-    const chapterCounts = {};
-    segments.forEach(s => { chapterCounts[s.chapterIndex] = (chapterCounts[s.chapterIndex] || 0) + 1; });
-    const chapSummary = Object.entries(chapterCounts)
-      .sort(([a],[b]) => Number(a)-Number(b))
-      .map(([ch, n]) => `Ch${ch}: ${n}개`).join(' · ');
+    if (statsBar) {
+      const introTxt = parsed.intros.length > 0 ? `인트로 ${parsed.intros.length}개 + ` : '';
+      statsBar.innerHTML = `${introTxt}<strong>${totalClips}개</strong> 단락 (챕터 ${parsed.chapters.length}개)`;
+    }
 
-    if (statsBar) statsBar.innerHTML = `<strong>${segments.length}개</strong> 단락 감지됨 &nbsp;·&nbsp; ${Utils.escapeHtml(chapSummary)}`;
+    let html = '';
 
-    if (preview) preview.innerHTML = segments.map(s => {
-      const preview1 = s.text.replace(/\n/g, ' ').slice(0, 42);
-      return `<div class="preview-item">
-        <span class="preview-num">${Utils.escapeHtml(s.id)}</span>
-        <span class="preview-text">${Utils.escapeHtml(preview1)}${s.text.length > 42 ? '…' : ''}</span>
+    // Intros
+    if (parsed.intros.length > 0) {
+      html += `<div style="font-size:11px;font-weight:600;color:var(--text-tertiary);padding:4px 6px 2px">인트로</div>`;
+      html += parsed.intros.map(s => {
+        const lineCount = s.text ? s.text.split('\n').filter(l => l.trim()).length : 0;
+        return `<div class="preview-item" style="padding-left:14px">
+          <span class="preview-num">${Utils.escapeHtml(s.id)}</span>
+          <span class="preview-text">${Utils.escapeHtml(s.chapterTitle)} (${lineCount}줄)</span>
+        </div>`;
+      }).join('');
+    }
+
+    // Chapters
+    for (const ch of parsed.chapters) {
+      const ids = ch.clips.map(c => c.id).join(', ');
+      const titleDisp = ch.subtitle ? `${Utils.escapeHtml(ch.title.split('：')[0].split(':')[0])}：${Utils.escapeHtml(ch.subtitle)}` : Utils.escapeHtml(ch.title);
+      html += `<div class="preview-item" style="margin-top:4px">
+        <span class="preview-num" style="min-width:auto;color:var(--accent);font-weight:600">▸</span>
+        <span class="preview-text"><strong>${titleDisp}</strong> (${ch.clips.length}개: ${Utils.escapeHtml(ids)})</span>
       </div>`;
-    }).join('');
+    }
+
+    if (preview) preview.innerHTML = html || '<div class="preview-empty">파싱된 단락이 없습니다.</div>';
   }
 
   function onNext() {
     const proj = App.currentProject(); if (!proj) return;
-    const text = document.getElementById('scriptText').value;
-    const segments = parseScript(text);
-    if (segments.length === 0) {
-      alert('대본을 입력해주세요.\n\n형식 예시:\n1-1\n\n나레이션 텍스트...\n\n1-2\n\n다음 단락...');
+    const text   = document.getElementById('scriptText').value;
+    const parsed = parseScript(text);
+    const totalClips = parsed.chapters.reduce((s, c) => s + c.clips.length, 0);
+
+    if (totalClips === 0 && parsed.intros.length === 0) {
+      alert('대본을 입력해주세요.\n\n형식 예시:\n【チャプター1】\n<1-1>\n나레이션 텍스트...\n<1-2>\n다음 단락...');
       return;
     }
 
     proj.name = document.getElementById('projectName').value.trim() || '새 프로젝트';
     document.getElementById('projectNameDisplay').textContent = proj.name;
+    proj.includeIntros = document.getElementById('includeIntros')?.checked ?? false;
 
-    // Sync clips: preserve existing (by id), create new
+    // Flatten: intros first, then chapter clips in order
+    const allSegments = [
+      ...parsed.intros,
+      ...parsed.chapters.flatMap(ch => ch.clips),
+    ];
+
     const existingMap = new Map(proj.clips.map(c => [c.id, c]));
-    proj.clips = segments.map(seg => {
+    proj.clips = allSegments.map(seg => {
       const existing = existingMap.get(seg.id);
       if (existing) {
-        existing.text = seg.text;
+        existing.text         = seg.text;
         existing.chapterIndex = seg.chapterIndex;
-        existing.subIndex = seg.subIndex;
+        existing.subIndex     = seg.subIndex;
+        existing.chapterTitle = seg.chapterTitle;
+        existing.isIntro      = seg.isIntro;
         return existing;
       }
       return {
         id: seg.id,
         chapterIndex: seg.chapterIndex,
         subIndex: seg.subIndex,
+        chapterTitle: seg.chapterTitle,
+        isIntro: seg.isIntro,
         text: seg.text,
         toneOverride: null,
         status: 'todo',
@@ -872,7 +965,7 @@ const ScriptView = (() => {
     location.hash = 'narrator';
   }
 
-  return { onEnter, onNameChange, onTextChange, onNext, updatePreview };
+  return { onEnter, onNameChange, onTextChange, onIncludeIntrosChange, onNext, updatePreview };
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -977,20 +1070,44 @@ const WorkbenchView = (() => {
       grid.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-tertiary);font-size:13px;grid-column:1/-1">대본 단계에서 클립을 먼저 입력해주세요.</div>';
       return;
     }
-    const clips = _filter === 'all' ? proj.clips : proj.clips.filter(c => c.status === _filter);
-    if (clips.length === 0) {
-      grid.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-tertiary);font-size:13px;grid-column:1/-1">해당하는 클립이 없습니다.</div>';
-      return;
+
+    const filterFn = c => _filter === 'all' || c.status === _filter;
+    const introClips = proj.clips.filter(c => (c.isIntro ?? false));
+    const mainClips  = proj.clips.filter(c => !(c.isIntro ?? false));
+    const includeIntros = proj.includeIntros ?? false;
+
+    let html = '';
+
+    // Intro section — always shown if intros exist
+    if (introClips.length > 0) {
+      html += `<div class="chapter-header">インィトロ</div>`;
+      if (!includeIntros) {
+        html += `<div style="grid-column:1/-1;padding:6px 4px 10px;font-size:12px;color:var(--text-tertiary)">
+          현재 변환/ZIP에서 제외됩니다.
+          <a href="#script" style="color:var(--accent);cursor:pointer">← 대본 단계</a>에서 체크 시 포함됩니다.
+        </div>`;
+      } else {
+        const vis = introClips.filter(filterFn);
+        for (const c of vis) html += _cardHTML(c, proj);
+        if (vis.length === 0) html += `<div style="grid-column:1/-1;padding:6px 4px;font-size:12px;color:var(--text-tertiary)">해당 필터에 맞는 인트로 없음</div>`;
+      }
     }
 
-    let lastChapter = null;
-    let html = '';
-    for (const c of clips) {
-      if (c.chapterIndex !== lastChapter) {
-        lastChapter = c.chapterIndex;
-        html += `<div class="chapter-header">Chapter ${c.chapterIndex}</div>`;
+    // Chapter clips grouped by chapterIndex
+    let lastChapterIdx = null;
+    const visMain = mainClips.filter(filterFn);
+    for (const c of visMain) {
+      if (c.chapterIndex !== lastChapterIdx) {
+        lastChapterIdx = c.chapterIndex;
+        const title = c.chapterTitle || `チャプター${c.chapterIndex}`;
+        html += `<div class="chapter-header">${Utils.escapeHtml(title)}</div>`;
       }
       html += _cardHTML(c, proj);
+    }
+
+    if (!html) {
+      grid.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-tertiary);font-size:13px;grid-column:1/-1">해당하는 클립이 없습니다.</div>';
+      return;
     }
     grid.innerHTML = html;
 
@@ -1061,9 +1178,11 @@ const WorkbenchView = (() => {
 
   function updateToolbar() {
     const proj  = App.currentProject(); if (!proj) return;
-    const total = proj.clips.length;
-    const done  = proj.clips.filter(c => c.status === 'done').length;
-    const pct   = total > 0 ? Math.round(done / total * 100) : 0;
+    // Count only active clips (exclude intros if not included)
+    const active = proj.clips.filter(c => !(c.isIntro ?? false) || (proj.includeIntros ?? false));
+    const total  = active.length;
+    const done   = active.filter(c => c.status === 'done').length;
+    const pct    = total > 0 ? Math.round(done / total * 100) : 0;
     const pt = document.getElementById('progressText'); if (pt) pt.textContent = `${done} / ${total} 완료`;
     const pf = document.getElementById('progressFill'); if (pf) pf.style.width = pct + '%';
     const n  = _selected.size;
@@ -1077,7 +1196,8 @@ const WorkbenchView = (() => {
     if (card) card.classList.toggle('is-selected', checked);
     updateToolbar();
     const proj = App.currentProject(); if (!proj) return;
-    const allChecked = proj.clips.every(c => _selected.has(c.id));
+    const active = proj.clips.filter(c => !(c.isIntro ?? false) || (proj.includeIntros ?? false));
+    const allChecked = active.length > 0 && active.every(c => _selected.has(c.id));
     const sa = document.getElementById('selectAll'); if (sa) sa.checked = allChecked;
   }
 
@@ -1115,9 +1235,12 @@ const WorkbenchView = (() => {
 
   async function downloadZip() {
     const proj = App.currentProject(); if (!proj) return;
-    const done = proj.clips.filter(c => c.status === 'done');
+    const includeIntros = proj.includeIntros ?? false;
+    // Only include active clips (respect includeIntros)
+    const active = proj.clips.filter(c => !(c.isIntro ?? false) || includeIntros);
+    const done   = active.filter(c => c.status === 'done');
     if (done.length === 0) { alert('완료된 클립이 없습니다.'); return; }
-    const undone = proj.clips.length - done.length;
+    const undone = active.filter(c => c.status !== 'done').length;
     if (undone > 0 && !confirm(`${undone}개 클립이 미완료입니다. 완료된 ${done.length}개만 다운로드하시겠어요?`)) return;
 
     if (!window.JSZip) {
@@ -1140,10 +1263,12 @@ const WorkbenchView = (() => {
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   }
 
-  // Build WAV filename with auto zero-padding for sorting
+  // Build WAV filename: intro-N.wav or zero-padded chapter clips
   function _wavName(clip, allClips) {
-    const maxCh  = Math.max(...allClips.map(c => c.chapterIndex || 1));
-    const maxSub = Math.max(...allClips.map(c => c.subIndex || 1));
+    if (clip.isIntro) return `${clip.id}.wav`;
+    const mainClips = allClips.filter(c => !(c.isIntro ?? false));
+    const maxCh  = Math.max(...mainClips.map(c => c.chapterIndex || 1));
+    const maxSub = Math.max(...mainClips.map(c => c.subIndex || 1));
     const padCh  = maxCh  >= 10;
     const padSub = maxSub >= 10;
     const [chStr, subStr] = clip.id.split('-');
