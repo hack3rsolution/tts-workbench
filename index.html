@@ -974,14 +974,19 @@ const ScriptView = (() => {
 const NarratorView = (() => {
   function onEnter() {
     const proj = App.currentProject(); if (!proj) return;
-    const narrator = proj.narrator || { voice: 'Charon', baseTone: DEFAULT_NARRATOR_TONE };
+    if (!proj.narrator) {
+      proj.narrator = { voice: 'Charon', baseTone: DEFAULT_NARRATOR_TONE };
+    }
+    const narrator = proj.narrator;
+
+    // Set textarea before rebuilding select — prevents stale read if change fires during innerHTML
+    document.getElementById('narratorTone').value = narrator.baseTone ?? DEFAULT_NARRATOR_TONE;
 
     const voiceSel = document.getElementById('narratorVoice');
     voiceSel.innerHTML = VOICES.map(([v,l]) =>
-      `<option value="${v}"${narrator.voice === v ? ' selected' : ''}>${Utils.escapeHtml(l)}</option>`
+      `<option value="${v}">${Utils.escapeHtml(l)}</option>`
     ).join('');
-
-    document.getElementById('narratorTone').value = narrator.baseTone || '';
+    voiceSel.value = narrator.voice || 'Charon';
 
     const presetsEl = document.getElementById('narratorTonePresets');
     presetsEl.innerHTML = TONE_PRESETS.map(p =>
@@ -991,9 +996,12 @@ const NarratorView = (() => {
 
   function save() {
     const proj = App.currentProject(); if (!proj) return;
-    if (!proj.narrator) proj.narrator = { voice: 'Charon', baseTone: '' };
-    proj.narrator.voice    = document.getElementById('narratorVoice').value;
-    proj.narrator.baseTone = document.getElementById('narratorTone').value.trim();
+    if (!proj.narrator) proj.narrator = { voice: 'Charon', baseTone: DEFAULT_NARRATOR_TONE };
+    const voiceEl = document.getElementById('narratorVoice');
+    const toneEl  = document.getElementById('narratorTone');
+    const voice   = voiceEl?.value || '';
+    proj.narrator.voice    = VOICES.some(([v]) => v === voice) ? voice : (proj.narrator.voice || 'Charon');
+    proj.narrator.baseTone = toneEl?.value.trim() ?? proj.narrator.baseTone;
     App.scheduleSave();
   }
 
