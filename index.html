@@ -654,6 +654,7 @@ const TTS = (() => {
     if (!apiKey) throw new Error('API Key가 없습니다. #setup을 확인해주세요.');
 
     const voice = project.narrator?.voice || 'Charon';
+    const toneSource = clip.toneOverride ? 'toneOverride' : 'narrator.baseTone';
     const tone  = clip.toneOverride || project.narrator?.baseTone || '';
 
     // Apply user dict (longest match first)
@@ -668,18 +669,61 @@ const TTS = (() => {
       contents: [{ parts: [{ text: promptText }] }],
       generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } },
     };
-    const res = await fetch(`${proxyUrl}/v1beta/models/${model}:generateContent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': apiKey },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) { const t=await res.text(); throw new Error(`API ${res.status}: ${t.slice(0,200)}`); }
-    const json = await res.json();
-    const part = json?.candidates?.[0]?.content?.parts?.[0];
-    const b64  = part?.inlineData?.data;
-    if (!b64) throw new Error('응답에 오디오 없음');
-    const sr = AudioUtils.parsePcmRate(part?.inlineData?.mimeType || '') || 24000;
-    return AudioUtils.pcmToWav(AudioUtils.base64ToBytes(b64), sr, 1, 16);
+    const reqUrl  = `${proxyUrl}/v1beta/models/${model}:generateContent`;
+    const startAt = new Date().toISOString();
+    const t0      = performance.now();
+
+    console.group(`[TTS DEBUG] ▶ 요청 clip=${clip.id} @ ${startAt}`);
+    console.log('[TTS DEBUG] clip.id          :', clip.id);
+    console.log('[TTS DEBUG] clip.text        :', clip.text);
+    console.log('[TTS DEBUG] includeIntros    :', project.includeIntros);
+    console.log('[TTS DEBUG] clip.isIntro     :', clip.isIntro);
+    console.log('[TTS DEBUG] 톤 출처          :', toneSource, '=', tone || '(empty)');
+    console.log('[TTS DEBUG] 사전 적용 후 text:', text);
+    console.log('[TTS DEBUG] 최종 promptText  :', promptText);
+    console.log('[TTS DEBUG] 요청 body        :', JSON.stringify(body, null, 2));
+    console.log('[TTS DEBUG] 요청 URL         :', reqUrl);
+    console.log('[TTS DEBUG] 모델             :', model);
+    console.log('[TTS DEBUG] voice            :', voice);
+    console.groupEnd();
+
+    let resText = '';
+    try {
+      const res = await fetch(reqUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': apiKey },
+        body: JSON.stringify(body),
+      });
+      const elapsed = Math.round(performance.now() - t0);
+      resText = await res.text();
+
+      console.group(`[TTS DEBUG] ◀ 응답 clip=${clip.id} status=${res.status} (${elapsed}ms)`);
+      console.log('[TTS DEBUG] HTTP 상태       :', res.status);
+      console.log('[TTS DEBUG] 소요 시간       :', elapsed, 'ms');
+      if (res.ok) {
+        console.log('[TTS DEBUG] 응답 본문       : [audio data:', resText.length, 'bytes]');
+      } else {
+        console.log('[TTS DEBUG] 응답 본문       :', resText);
+      }
+      console.groupEnd();
+
+      if (!res.ok) throw new Error(`API ${res.status}: ${resText.slice(0, 200)}`);
+
+      const json = JSON.parse(resText);
+      const part = json?.candidates?.[0]?.content?.parts?.[0];
+      const b64  = part?.inlineData?.data;
+      if (!b64) throw new Error('응답에 오디오 없음');
+      const sr = AudioUtils.parsePcmRate(part?.inlineData?.mimeType || '') || 24000;
+      return AudioUtils.pcmToWav(AudioUtils.base64ToBytes(b64), sr, 1, 16);
+    } catch (err) {
+      console.group(`[TTS DEBUG] ✗ 에러 clip=${clip.id}`);
+      console.log('[TTS DEBUG] 에러 메시지     :', err.message);
+      console.log('[TTS DEBUG] clip 객체       :', JSON.stringify(clip));
+      console.log('[TTS DEBUG] project.narrator:', JSON.stringify(project.narrator));
+      if (err.stack) console.log('[TTS DEBUG] 스택            :', err.stack);
+      console.groupEnd();
+      throw err;
+    }
   }
   return { convertClip };
 })();
