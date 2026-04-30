@@ -255,14 +255,13 @@
         <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:flex-end;margin-bottom:10px">
           <div class="field" style="margin-bottom:0">
             <label class="field-label" for="narratorVoice">목소리</label>
-            <select class="select" id="narratorVoice" onchange="NarratorView.save()"></select>
+            <select class="select" id="narratorVoice"></select>
           </div>
           <button class="btn" onclick="NarratorView.test()" id="narratorTestBtn">▶ 시연</button>
         </div>
         <div class="field">
           <label class="field-label">기본 톤 지시 <span class="small">(자연어, 전 클립에 적용)</span></label>
           <textarea class="textarea" id="narratorTone" rows="3"
-            oninput="NarratorView.save()"
             placeholder="차분하고 자연스러운 나레이터 톤으로 읽어주세요. 「」 안의 대사는 등장인물의 대사이므로 약간 다른 톤으로 읽어주세요."></textarea>
           <div class="tone-presets" id="narratorTonePresets"></div>
         </div>
@@ -1016,37 +1015,72 @@ const ScriptView = (() => {
 // MODULE: NarratorView
 // ─────────────────────────────────────────────────────────────────────────────
 const NarratorView = (() => {
+  let _debounceTimer = null;
+
+  // Stable function references required for removeEventListener
+  function _onVoiceChange() { save(); }
+  function _onToneInput()   { clearTimeout(_debounceTimer); _debounceTimer = setTimeout(save, 300); }
+
   function onEnter() {
     const proj = App.currentProject(); if (!proj) return;
-    if (!proj.narrator) {
-      proj.narrator = { voice: 'Charon', baseTone: DEFAULT_NARRATOR_TONE };
-    }
+    if (!proj.narrator) proj.narrator = { voice: 'Charon', baseTone: DEFAULT_NARRATOR_TONE };
     const narrator = proj.narrator;
 
-    // Set textarea before rebuilding select — prevents stale read if change fires during innerHTML
-    document.getElementById('narratorTone').value = narrator.baseTone ?? DEFAULT_NARRATOR_TONE;
-
     const voiceSel = document.getElementById('narratorVoice');
-    voiceSel.innerHTML = VOICES.map(([v,l]) =>
-      `<option value="${v}">${Utils.escapeHtml(l)}</option>`
-    ).join('');
+    const toneEl   = document.getElementById('narratorTone');
+
+    // Detach listeners BEFORE any DOM mutation.
+    // On Windows Chromium, setting options (via innerHTML or options API) fires the change
+    // event synchronously when the select value changes, which would call save() prematurely.
+    voiceSel.removeEventListener('change', _onVoiceChange);
+    toneEl.removeEventListener('input',   _onToneInput);
+
+    // Sync textarea value (no listeners attached, no event risk)
+    toneEl.value = narrator.baseTone ?? DEFAULT_NARRATOR_TONE;
+
+    // Rebuild options using the Option constructor + options.add().
+    // This API path never fires a change event regardless of browser.
+    voiceSel.options.length = 0;
+    for (const [v, l] of VOICES) voiceSel.options.add(new Option(l, v));
     voiceSel.value = narrator.voice || 'Charon';
 
+    // Preset chips (buttons only, no form event risk)
     const presetsEl = document.getElementById('narratorTonePresets');
     presetsEl.innerHTML = TONE_PRESETS.map(p =>
       `<button class="tone-preset-chip" onclick="NarratorView.addPreset('${Utils.escapeJs(p)}')">${p}</button>`
     ).join('');
+
+    // Re-attach AFTER the DOM is fully initialised
+    voiceSel.addEventListener('change', _onVoiceChange);
+    toneEl.addEventListener('input',   _onToneInput);
   }
 
-  function save() {
+  async function save() {
+    clearTimeout(_debounceTimer);
     const proj = App.currentProject(); if (!proj) return;
     if (!proj.narrator) proj.narrator = { voice: 'Charon', baseTone: DEFAULT_NARRATOR_TONE };
-    const voiceEl = document.getElementById('narratorVoice');
-    const toneEl  = document.getElementById('narratorTone');
-    const voice   = voiceEl?.value || '';
-    proj.narrator.voice    = VOICES.some(([v]) => v === voice) ? voice : (proj.narrator.voice || 'Charon');
-    proj.narrator.baseTone = toneEl?.value.trim() ?? proj.narrator.baseTone;
-    App.scheduleSave();
+
+    const voiceSel = document.getElementById('narratorVoice');
+    const toneEl   = document.getElementById('narratorTone');
+    const rawVoice = voiceSel?.value || '';
+    const rawTone  = toneEl?.value.trim() ?? '';
+
+    console.log('[TTS DEBUG] NarratorView.save() 시작 — 현재:', JSON.stringify(proj.narrator));
+
+    proj.narrator.voice    = VOICES.some(([v]) => v === rawVoice) ? rawVoice : (proj.narrator.voice || 'Charon');
+    proj.narrator.baseTone = rawTone !== '' ? rawTone : (proj.narrator.baseTone || DEFAULT_NARRATOR_TONE);
+
+    console.log('[TTS DEBUG] NarratorView.save() 저장 직전:', JSON.stringify(proj.narrator));
+
+    await App.saveNow();
+
+    const stored = await Storage.get('projects', proj.id);
+    if (stored?.narrator?.voice !== proj.narrator.voice || stored?.narrator?.baseTone !== proj.narrator.baseTone) {
+      console.warn('[TTS DEBUG] NarratorView.save() ⚠ IndexedDB 불일치!',
+        { memory: proj.narrator, stored: stored?.narrator });
+    } else {
+      console.log('[TTS DEBUG] NarratorView.save() 완료 — IndexedDB 일치:', JSON.stringify(stored.narrator));
+    }
   }
 
   function addPreset(preset) {
@@ -1057,10 +1091,8 @@ const NarratorView = (() => {
 
   async function test() {
     const proj = App.currentProject(); if (!proj) return;
-    if (!Settings.get('tts.apiKey')) {
-      alert('설정 화면에서 API Key를 먼저 저장해주세요.'); return;
-    }
-    save();
+    if (!Settings.get('tts.apiKey')) { alert('설정 화면에서 API Key를 먼저 저장해주세요.'); return; }
+    await save();
     const btn = document.getElementById('narratorTestBtn');
     if (btn) { btn.disabled=true; btn.textContent='…'; }
     try {
