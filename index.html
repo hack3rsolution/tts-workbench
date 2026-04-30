@@ -1223,9 +1223,12 @@ const WorkbenchView = (() => {
     _audioUrls.set(clipId, URL.createObjectURL(rec.blob));
   }
 
-  function _loadAllAudio() {
+  async function _loadAllAudio() {
     const proj = App.currentProject(); if (!proj) return;
-    proj.clips.filter(c => c.status === 'done' && c.audioBlobKey).forEach(c => _loadAudio(c.id));
+    await Promise.all(
+      proj.clips.filter(c => c.status === 'done' && c.audioBlobKey).map(c => _loadAudio(c.id))
+    );
+    render();
   }
 
   function updateToolbar() {
@@ -1328,6 +1331,11 @@ const WorkbenchView = (() => {
     const sub = padSub ? subStr.padStart(2, '0') : subStr;
     return `${ch}-${sub}.wav`;
   }
+
+  window.addEventListener('beforeunload', () => {
+    _audioUrls.forEach(url => URL.revokeObjectURL(url));
+    _audioUrls.clear();
+  });
 
   return { onEnter, setFilter, render, updateCard, updateToolbar, onCheck, toggleSelectAll, saveToneOverride, convertOne, batchConvert, downloadOne, downloadZip };
 })();
