@@ -220,7 +220,10 @@
         </div>
         <div class="script-layout">
           <div>
-            <label class="field-label">대본 텍스트</label>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <span class="field-label" style="margin-bottom:0">대본 텍스트</span>
+              <button class="btn btn-sm btn-ghost btn-danger" onclick="ScriptView.clearScript()">전체 삭제</button>
+            </div>
             <textarea class="textarea" id="scriptText" rows="14"
               placeholder="【イントロ】&#10;&#10;인트로 본문...&#10;&#10;【チャプター1】&#10;<1-1>&#10;나레이션 한 문장.&#10;「인물 대사」&#10;<1-2>&#10;다음 단락...&#10;&#10;【チャプター2】&#10;<2-1>&#10;..."
               oninput="ScriptView.onTextChange()"></textarea>
@@ -315,6 +318,8 @@
         <button class="btn btn-primary btn-sm" id="batchConvertBtn" onclick="WorkbenchView.batchConvert()">선택 0개 변환</button>
         <span class="small" id="costEstimate"></span>
         <button class="btn btn-sm" onclick="WorkbenchView.downloadZip()">ZIP 다운로드</button>
+        <button class="btn btn-sm btn-ghost btn-danger" id="deleteSelectedBtn" onclick="WorkbenchView.deleteSelected()" disabled>🗑 선택 삭제</button>
+        <button class="btn btn-sm btn-ghost btn-danger" onclick="WorkbenchView.deleteAll()">🗑 전체 삭제</button>
       </div>
 
       <div class="filter-tabs" id="filterTabs">
@@ -910,6 +915,15 @@ const ScriptView = (() => {
     App.scheduleSave();
   }
 
+  function clearScript() {
+    if (!confirm('대본을 전체 삭제하시겠습니까?\n클립 목록도 초기화됩니다.')) return;
+    document.getElementById('scriptText').value = '';
+    const proj = App.currentProject(); if (!proj) return;
+    proj.clips = [];
+    App.scheduleSave();
+    updatePreview();
+  }
+
   function updatePreview() {
     const text     = document.getElementById('scriptText').value;
     const parsed   = parseScript(text);
@@ -1008,7 +1022,7 @@ const ScriptView = (() => {
     location.hash = 'narrator';
   }
 
-  return { onEnter, onNameChange, onTextChange, onIncludeIntrosChange, onNext, updatePreview };
+  return { onEnter, onNameChange, onTextChange, onIncludeIntrosChange, onNext, updatePreview, clearScript };
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1275,6 +1289,7 @@ const WorkbenchView = (() => {
     const n  = _selected.size;
     const bb = document.getElementById('batchConvertBtn'); if (bb) bb.textContent = `선택 ${n}개 변환`;
     const ce = document.getElementById('costEstimate'); if (ce) ce.textContent = n > 0 ? `예상 $${(n*0.001).toFixed(3)} 미만` : '';
+    const ds = document.getElementById('deleteSelectedBtn'); if (ds) ds.disabled = n === 0;
   }
 
   function onCheck(clipId, checked) {
@@ -1301,6 +1316,43 @@ const WorkbenchView = (() => {
     const clip = proj.clips.find(c => c.id === clipId); if (!clip) return;
     clip.toneOverride = val.trim() || null;
     App.scheduleSave();
+  }
+
+  async function _deleteAudioForIds(clipIds) {
+    const proj = App.currentProject(); if (!proj) return;
+    for (const id of clipIds) {
+      const clip = proj.clips.find(c => c.id === id); if (!clip) continue;
+      if (clip.audioBlobKey) {
+        await Storage.del('audioBlobs', clip.audioBlobKey);
+        if (_audioUrls.has(id)) { URL.revokeObjectURL(_audioUrls.get(id)); _audioUrls.delete(id); }
+        clip.audioBlobKey  = null;
+        clip.audioMimeType = null;
+      }
+      clip.status          = 'todo';
+      clip.note            = null;
+      clip.lastConvertedAt = null;
+    }
+  }
+
+  async function deleteSelected() {
+    if (_selected.size === 0) return;
+    if (!confirm(`선택한 ${_selected.size}개 클립의 음성 데이터를 삭제하시겠습니까?`)) return;
+    await _deleteAudioForIds([..._selected]);
+    _selected.clear();
+    App.scheduleSave();
+    render();
+    updateToolbar();
+  }
+
+  async function deleteAll() {
+    const proj = App.currentProject(); if (!proj) return;
+    const targets = proj.clips.filter(c => c.audioBlobKey);
+    if (targets.length === 0) { alert('삭제할 음성 데이터가 없습니다.'); return; }
+    if (!confirm(`모든 클립(${targets.length}개)의 음성 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+    await _deleteAudioForIds(targets.map(c => c.id));
+    App.scheduleSave();
+    render();
+    updateToolbar();
   }
 
   function convertOne(clipId) { BatchQueue.enqueue([clipId]); }
@@ -1369,7 +1421,7 @@ const WorkbenchView = (() => {
     _audioUrls.clear();
   });
 
-  return { onEnter, setFilter, render, updateCard, updateToolbar, onCheck, toggleSelectAll, saveToneOverride, convertOne, batchConvert, downloadOne, downloadZip };
+  return { onEnter, setFilter, render, updateCard, updateToolbar, onCheck, toggleSelectAll, saveToneOverride, convertOne, batchConvert, deleteSelected, deleteAll, downloadOne, downloadZip };
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
