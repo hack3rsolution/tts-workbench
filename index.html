@@ -667,6 +667,9 @@ const TTS = (() => {
     const sorted = Object.entries(readings).filter(([,r])=>r).sort(([a],[b])=>b.length-a.length);
     for (const [surface, reading] of sorted) text = text.replaceAll(surface, reading);
 
+    // Strip [] and <> brackets, keep content inside for natural TTS reading
+    text = text.replace(/\[([^\]]*)\]/g, '$1').replace(/<([^>]*)>/g, '$1');
+
     const promptText = tone ? `${tone}: ${text}` : text;
 
     const body = {
