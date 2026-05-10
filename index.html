@@ -384,7 +384,7 @@ function parseScript(text) {
   let introCount    = 0;
 
   const chapterRe = /^【(.+?)】\s*$/;
-  const clipRe    = /^<(\d+)-(\d+)>\s*$/;
+  const clipRe    = /^[<＜](\d+)-(\d+)[>＞]\s*$/;
 
   function flushClip() {
     if (!currentClip) return;
@@ -667,8 +667,8 @@ const TTS = (() => {
     const sorted = Object.entries(readings).filter(([,r])=>r).sort(([a],[b])=>b.length-a.length);
     for (const [surface, reading] of sorted) text = text.replaceAll(surface, reading);
 
-    // Strip [] and <> brackets, keep content inside for natural TTS reading
-    text = text.replace(/\[([^\]]*)\]/g, '$1').replace(/<([^>]*)>/g, '$1');
+    // Strip [] and <> brackets (half/full-width), keep content inside for natural TTS reading
+    text = text.replace(/[\[［]([^\]］]*)[\]］]/g, '$1').replace(/[<＜]([^>＞]*)[>＞]/g, '$1');
 
     const promptText = tone ? `${tone}: ${text}` : text;
 
