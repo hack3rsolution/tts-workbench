@@ -660,7 +660,39 @@ const AudioUtils = (() => {
     new Uint8Array(buf,44).set(pcm);
     return new Blob([buf],{type:'audio/wav'});
   }
-  return { parsePcmRate, base64ToBytes, pcmToWav };
+  // TTS 오디오 정리: WAV(RIFF)면 PCM 만 추출, 홀수 바이트 제거, 끝/시작에 짧은 페이드 적용
+  // → 클립 끝의 '찍/틱' 하는 클릭 노이즈(파형이 0이 아닌 곳에서 뚝 끊김, 잘못된 헤더 바이트) 제거
+  function cleanTtsAudio(bytes, srHint) {
+    let pcm = bytes, sr = srHint || 24000, ch = 1, bps = 16;
+    const isRiff = bytes.length > 12 && String.fromCharCode(...bytes.slice(0,4)) === 'RIFF' && String.fromCharCode(...bytes.slice(8,12)) === 'WAVE';
+    if (isRiff) {
+      const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      let off = 12;
+      while (off + 8 <= bytes.length) {
+        const id = String.fromCharCode(...bytes.slice(off, off+4));
+        let size = dv.getUint32(off+4, true);
+        const body = off + 8;
+        if (id === 'fmt ') { ch = dv.getUint16(body+2, true); sr = dv.getUint32(body+4, true); bps = dv.getUint16(body+14, true); }
+        if (id === 'data') { size = Math.min(size, bytes.length - body); pcm = bytes.slice(body, body + size); break; }
+        off = body + size + (size & 1);
+      }
+    }
+    if (bps !== 16) return pcmToWav(pcm, sr, ch, bps);
+    const frame = 2 * ch;
+    const len = pcm.length - (pcm.length % frame);
+    const out = new Uint8Array(len); out.set(pcm.subarray(0, len));
+    const samples = new Int16Array(out.buffer);
+    const frames = samples.length / ch;
+    const fadeIn  = Math.min(Math.round(sr * 0.005), frames >> 2);
+    const fadeOut = Math.min(Math.round(sr * 0.04),  frames >> 2);
+    for (let i = 0; i < fadeIn; i++)  for (let c = 0; c < ch; c++) samples[i*ch+c] = Math.round(samples[i*ch+c] * (i / fadeIn));
+    for (let i = 0; i < fadeOut; i++) { const f = frames - 1 - i; for (let c = 0; c < ch; c++) samples[f*ch+c] = Math.round(samples[f*ch+c] * (i / fadeOut)); }
+    // 끝에 50ms 무음 패딩 (플레이어 종료 시 튐 방지)
+    const pad = new Uint8Array(Math.round(sr * 0.05) * frame);
+    const merged = new Uint8Array(out.length + pad.length); merged.set(out); merged.set(pad, out.length);
+    return pcmToWav(merged, sr, ch, 16);
+  }
+  return { parsePcmRate, base64ToBytes, pcmToWav, cleanTtsAudio };
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -847,17 +879,13 @@ const TTS = (() => {
         const audio = blocks.filter(c => c && c.type === 'audio' && c.data).pop();
         if (!audio) throw new Error('응답에 오디오 없음');
         const mime  = (audio.mime_type || audio.mimeType || 'audio/wav').toLowerCase();
-        const bytes = AudioUtils.base64ToBytes(audio.data);
-        const isRiff = bytes.length > 4 && bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46;
-        if (isRiff) return new Blob([bytes], { type: 'audio/wav' });
-        const sr = AudioUtils.parsePcmRate(mime) || 24000;
-        return AudioUtils.pcmToWav(bytes, sr, 1, 16);
+        return AudioUtils.cleanTtsAudio(AudioUtils.base64ToBytes(audio.data), AudioUtils.parsePcmRate(mime) || 24000);
       }
       const part = json?.candidates?.[0]?.content?.parts?.[0];
       const b64  = part?.inlineData?.data;
       if (!b64) throw new Error('응답에 오디오 없음');
       const sr = AudioUtils.parsePcmRate(part?.inlineData?.mimeType || '') || 24000;
-      return AudioUtils.pcmToWav(AudioUtils.base64ToBytes(b64), sr, 1, 16);
+      return AudioUtils.cleanTtsAudio(AudioUtils.base64ToBytes(b64), sr);
     } catch (err) {
       console.group(`[TTS DEBUG] ✗ 에러 clip=${clip.id}`);
       console.log('[TTS DEBUG] 에러 메시지     :', err.message);
@@ -1225,7 +1253,8 @@ const NarratorView = (() => {
     console.log('[TTS DEBUG] NarratorView.save() 시작 — 현재:', JSON.stringify(proj.narrator));
 
     proj.narrator.voice    = VOICES.some(([v]) => v === rawVoice) ? rawVoice : (proj.narrator.voice || 'Charon');
-    proj.narrator.baseTone = rawTone !== '' ? rawTone : (proj.narrator.baseTone || DEFAULT_NARRATOR_TONE);
+    // 메모를 비워 두는 것도 유효한 설정 → 빈 값 그대로 저장 (톤 지시 없이 읽음)
+    proj.narrator.baseTone = rawTone;
 
     console.log('[TTS DEBUG] NarratorView.save() 저장 직전:', JSON.stringify(proj.narrator));
 
