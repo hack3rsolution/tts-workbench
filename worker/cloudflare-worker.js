@@ -36,7 +36,7 @@ function isOriginAllowed(origin) {
 function corsHeaders(origin) {
   return {
     'Access-Control-Allow-Origin': origin || '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, X-Goog-Api-Key',
     'Access-Control-Max-Age': '86400',
   };
@@ -54,7 +54,7 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
 
-    if (request.method !== 'POST') {
+    if (request.method !== 'POST' && request.method !== 'GET') {
       return new Response('Method not allowed', {
         status: 405,
         headers: corsHeaders(origin),
@@ -84,7 +84,7 @@ export default {
     }
 
     // Get URL path — caller specifies which Gemini model
-    // e.g. POST /v1beta/models/gemini-2.5-flash-preview-tts:generateContent
+    // e.g. POST /v1beta/models/gemini-3.8-flash-tts:generateContent
     const url = new URL(request.url);
     const apiPath = url.pathname; // e.g. "/v1beta/models/..."
 
@@ -101,17 +101,17 @@ export default {
       );
     }
 
-    const targetUrl = `https://generativelanguage.googleapis.com${apiPath}`;
+    const targetUrl = `https://generativelanguage.googleapis.com${apiPath}${url.search}`;
 
     try {
-      const body = await request.text();
+      const isGet = request.method === 'GET';
       const upstream = await fetch(targetUrl, {
-        method: 'POST',
+        method: request.method,
         headers: {
           'Content-Type': 'application/json',
           'X-Goog-Api-Key': apiKey,
         },
-        body,
+        body: isGet ? undefined : await request.text(),
       });
 
       const responseBody = await upstream.text();

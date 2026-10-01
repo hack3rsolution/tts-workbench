@@ -31,7 +31,7 @@
 | 항목 | 내용 |
 |------|------|
 | 앱 구조 | 단일 HTML 파일, 빌드 도구 없음 |
-| TTS | Google Gemini 2.5 Flash/Pro TTS Preview |
+| TTS | Google Gemini 3.1 ~ 3.8 TTS (기본: `gemini-3.8-flash-tts`, API Key로 사용 가능한 모델 자동 조회) |
 | 한자 처리 | [kuromoji.js](https://github.com/takuyaa/kuromoji) via jsDelivr CDN |
 | CORS 프록시 | Cloudflare Workers |
 | 오디오 변환 | PCM 16-bit mono 24 kHz → WAV (브라우저 내 처리) |
